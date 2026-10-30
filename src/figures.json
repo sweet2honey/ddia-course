@@ -1,0 +1,554 @@
+{
+ "1": [
+  {
+   "num": "1-1",
+   "src": "assets/fig/ddia_0101.png",
+   "caption": "将数据通过 ETL 导入数据仓库的简化示意图。"
+  },
+  {
+   "num": "1-2",
+   "src": "assets/fig/ddia_0102.png",
+   "caption": "软件类型及其运维方式的连续谱。"
+  }
+ ],
+ "10": [
+  {
+   "num": "10-1",
+   "src": "assets/fig/ddia_1001.png",
+   "caption": "这个系统不满足线性一致性，让球迷感到困惑。"
+  },
+  {
+   "num": "10-2",
+   "src": "assets/fig/ddia_1002.png",
+   "caption": "如果读请求与写请求并发，则可能返回旧值，也可能返回新值。"
+  },
+  {
+   "num": "10-3",
+   "src": "assets/fig/ddia_1003.png",
+   "caption": "任何一次读取返回新值后，所有后续读取（同一或其他客户端上的读取）也必须返回新值。"
+  },
+  {
+   "num": "10-4",
+   "src": "assets/fig/ddia_1004.png",
+   "caption": "展示读写操作看似生效的时刻。B 的最后一次读取不满足线性一致性。"
+  },
+  {
+   "num": "10-5",
+   "src": "assets/fig/ddia_1005.png",
+   "caption": "Web 服务器与视频转码器既通过文件存储通信，也通过消息队列通信，由此可能发生竞态条件。"
+  },
+  {
+   "num": "10-6",
+   "src": "assets/fig/ddia_1006.png",
+   "caption": "当网络延迟变化不定时，仅靠法定人数不足以保证线性一致性。"
+  },
+  {
+   "num": "10-7",
+   "src": "assets/fig/ddia_1007.png",
+   "caption": "网络中断迫使系统在线性一致性与可用性之间作出选择。"
+  },
+  {
+   "num": "10-8",
+   "src": "assets/fig/ddia_1008.png",
+   "caption": "为聊天应用的消息分配自增整数 ID 的生成器。"
+  },
+  {
+   "num": "10-9",
+   "src": "assets/fig/ddia_1009.png",
+   "caption": "Lamport 时间戳给出了与因果关系一致的全序。"
+  },
+  {
+   "num": "10-10",
+   "src": "assets/fig/ddia_1010.png",
+   "caption": "用户 A 先把账户设为私密，再分享照片。使用不满足线性一致性的 ID 生成器时，未经授权的访客可能看到这张照片。"
+  }
+ ],
+ "11": [
+  {
+   "num": "11-1",
+   "src": "assets/fig/ddia_1101.png",
+   "caption": "一个包含三个 mapper 和三个 reducer 的 MapReduce 作业。"
+  },
+  {
+   "num": "11-2",
+   "src": "assets/fig/ddia_1102.png",
+   "caption": "用户活动日志与用户画像数据库的连接。"
+  },
+  {
+   "num": "11-3",
+   "src": "assets/fig/ddia_1103.png",
+   "caption": "基于用户 ID 的排序合并连接。若输入数据集由多个文件分片组成，可并行启动多个 mapper 处理。"
+  }
+ ],
+ "12": [
+  {
+   "num": "12-1",
+   "src": "assets/fig/ddia_1201.png",
+   "caption": "（a）负载均衡：由多个消费者分担一个主题的消费工作；（b）扇出：将每条消息传递给多个消费者。"
+  },
+  {
+   "num": "12-2",
+   "src": "assets/fig/ddia_1202.png",
+   "caption": "消费者 2 在处理 m3 时崩溃，因此 m3 稍后被重新传递给消费者 1。"
+  },
+  {
+   "num": "12-3",
+   "src": "assets/fig/ddia_1203.png",
+   "caption": "生产者把消息追加到主题分区文件中，消费者则顺序读取这些文件。"
+  },
+  {
+   "num": "12-4",
+   "src": "assets/fig/ddia_1204.png",
+   "caption": "数据库中的 X 先被设为 A，再被设为 B；写入到达搜索索引的顺序却恰好相反。"
+  },
+  {
+   "num": "12-5",
+   "src": "assets/fig/ddia_1205.png",
+   "caption": "按数据写入一个数据库的顺序取得数据，再按相同顺序将变化应用到其他系统。"
+  },
+  {
+   "num": "12-6",
+   "src": "assets/fig/ddia_1206.png",
+   "caption": "一个键值对日志：键是猫咪视频的 ID（mew、purr、scratch 或 yawn），值是播放次数。日志压实只保留每个键的最新值。"
+  },
+  {
+   "num": "12-7",
+   "src": "assets/fig/ddia_1207.png",
+   "caption": "应用当前状态与事件流之间的关系。"
+  },
+  {
+   "num": "12-8",
+   "src": "assets/fig/ddia_1208.png",
+   "caption": "按处理时间划分窗口，会因处理速率的变化而产生人为假象。"
+  }
+ ],
+ "13": [
+  {
+   "num": "13-1",
+   "src": "assets/fig/ddia_1301.png",
+   "caption": "在搜索索引中，写入（文档更新）与读取（查询）相遇。"
+  },
+  {
+   "num": "13-2",
+   "src": "assets/fig/ddia_1302.png",
+   "caption": "使用事件日志和流处理器，检查源账户是否有足够余额，并把资金原子地转入目标账户和手续费账户。"
+  }
+ ],
+ "14": [],
+ "2": [
+  {
+   "num": "2-1",
+   "src": "assets/fig/ddia_0201.png",
+   "caption": "一个允许用户相互关注的社交网络的简单关系模式。"
+  },
+  {
+   "num": "2-2",
+   "src": "assets/fig/ddia_0202.png",
+   "caption": "扇出——把新帖子投递给发帖用户的每一位关注者。"
+  },
+  {
+   "num": "2-3",
+   "src": "assets/fig/ddia_0203.png",
+   "caption": "当服务的吞吐量接近其处理能力上限时，排队会使响应时间急剧增加。"
+  },
+  {
+   "num": "2-4",
+   "src": "assets/fig/ddia_0204.png",
+   "caption": "响应时间、服务时间、网络延迟和排队延迟。"
+  },
+  {
+   "num": "2-5",
+   "src": "assets/fig/ddia_0205.png",
+   "caption": "用 100 次服务请求的响应时间样本说明平均值和分位数。"
+  },
+  {
+   "num": "2-6",
+   "src": "assets/fig/ddia_0206.png",
+   "caption": "当一次请求需要多个后端调用时，只需一个慢调用，就会拖慢整个最终用户请求。"
+  }
+ ],
+ "3": [
+  {
+   "num": "3-1",
+   "src": "assets/fig/ddia_0301.png",
+   "caption": "使用关系模式表示 LinkedIn 个人资料。"
+  },
+  {
+   "num": "3-2",
+   "src": "assets/fig/ddia_0302.png",
+   "caption": "一对多关系形成树状结构。"
+  },
+  {
+   "num": "3-3",
+   "src": "assets/fig/ddia_0303.png",
+   "caption": "关系模型中的多对多关系。"
+  },
+  {
+   "num": "3-4",
+   "src": "assets/fig/ddia_0304.png",
+   "caption": "文档模型中的多对多关系；每个虚线框内的数据可以组成一份文档。"
+  },
+  {
+   "num": "3-5",
+   "src": "assets/fig/ddia_0305.png",
+   "caption": "用于数据仓库的星型模式示例。"
+  },
+  {
+   "num": "3-6",
+   "src": "assets/fig/ddia_0306.png",
+   "caption": "图结构数据示例（框表示顶点，箭头表示边）。"
+  },
+  {
+   "num": "3-7",
+   "src": "assets/fig/ddia_0307.png",
+   "caption": "使用示例 3-12 中的 Datalog 规则确定爱达荷州在北美。"
+  },
+  {
+   "num": "3-8",
+   "src": "assets/fig/ddia_0308.png",
+   "caption": "以不可变事件日志作为权威数据源，并从中派生物化视图。"
+  },
+  {
+   "num": "3-9",
+   "src": "assets/fig/ddia_0309.png",
+   "caption": "将电影评分的关系数据库转换为矩阵表示。"
+  }
+ ],
+ "4": [
+  {
+   "num": "4-1",
+   "src": "assets/fig/ddia_0401.png",
+   "caption": "以类似 CSV 的格式存储键值对日志，并使用内存哈希映射建立索引。"
+  },
+  {
+   "num": "4-2",
+   "src": "assets/fig/ddia_0402.png",
+   "caption": "带有稀疏索引的 SSTable，查询可以直接跳到正确的数据块。"
+  },
+  {
+   "num": "4-3",
+   "src": "assets/fig/ddia_0403.png",
+   "caption": "合并多个 SSTable 段，仅保留每个键的最新值。"
+  },
+  {
+   "num": "4-4",
+   "src": "assets/fig/ddia_0404.png",
+   "caption": "布隆过滤器以概率方式快速判断某个键是否存在于某个 SSTable 中。"
+  },
+  {
+   "num": "4-5",
+   "src": "assets/fig/ddia_0405.png",
+   "caption": "使用 B 树索引查找键 251。先从根页沿引用进入键 200–300 所在的页，再进入键 250–270 所在的页。"
+  },
+  {
+   "num": "4-6",
+   "src": "assets/fig/ddia_0406.png",
+   "caption": "在边界键 337 处拆分页，使 B 树增长；父页也随之更新，以引用两个子页。"
+  },
+  {
+   "num": "4-7",
+   "src": "assets/fig/ddia_0407.png",
+   "caption": "按列而不是按行存储关系数据。"
+  },
+  {
+   "num": "4-8",
+   "src": "assets/fig/ddia_0408.png",
+   "caption": "对单列进行压缩并建立位图索引的存储方式。"
+  },
+  {
+   "num": "4-9",
+   "src": "assets/fig/ddia_0409.png",
+   "caption": "两张位图的按位与运算非常适合向量化处理。"
+  },
+  {
+   "num": "4-10",
+   "src": "assets/fig/ddia_0410.png",
+   "caption": "多维数据集的两个维度，通过求和聚合数据。"
+  },
+  {
+   "num": "4-11",
+   "src": "assets/fig/ddia_0411.png",
+   "caption": "在 HNSW 索引中查找最接近给定查询向量的数据库条目。"
+  }
+ ],
+ "5": [
+  {
+   "num": "5-1",
+   "src": "assets/fig/ddia_0501.png",
+   "caption": "旧版应用程序更新先前由新版应用程序写入的数据时，若处理不慎，可能丢失数据。"
+  },
+  {
+   "num": "5-2",
+   "src": "assets/fig/ddia_0502.png",
+   "caption": "示例 5-2 中的记录使用 MessagePack 编码后的结果。"
+  },
+  {
+   "num": "5-3",
+   "src": "assets/fig/ddia_0503.png",
+   "caption": "使用 Protocol Buffers 编码的示例记录。"
+  },
+  {
+   "num": "5-4",
+   "src": "assets/fig/ddia_0504.png",
+   "caption": "使用 Avro 编码的示例记录。"
+  },
+  {
+   "num": "5-5",
+   "src": "assets/fig/ddia_0505.png",
+   "caption": "Protocol Buffers 的编码与解码可以使用不同版本的模式。Avro 解码时使用两个模式：写入者模式必须与编码时所用模式完全相同，读取者模式则可以是较旧或较新的版本。"
+  },
+  {
+   "num": "5-6",
+   "src": "assets/fig/ddia_0506.png",
+   "caption": "Avro 读取器协调写入者模式与读取者模式之间的差异。"
+  },
+  {
+   "num": "5-7",
+   "src": "assets/fig/ddia_0507.png",
+   "caption": "使用图形化的业务流程模型与标记法（BPMN）表示工作流的示例。"
+  }
+ ],
+ "6": [
+  {
+   "num": "6-1",
+   "src": "assets/fig/ddia_0601.png",
+   "caption": "单主复制把所有写入都发往指定的领导者，再由领导者将变更流发送给各追随者副本。"
+  },
+  {
+   "num": "6-2",
+   "src": "assets/fig/ddia_0602.png",
+   "caption": "基于领导者的复制，其中一个追随者同步复制，另一个异步复制。"
+  },
+  {
+   "num": "6-3",
+   "src": "assets/fig/ddia_0603.png",
+   "caption": "用户写入后，又从陈旧副本读取。要防止这种异常，需要写后读一致性。"
+  },
+  {
+   "num": "6-4",
+   "src": "assets/fig/ddia_0604.png",
+   "caption": "用户先从较新的副本读取，随后从陈旧副本读取，时间仿佛倒退了。要防止这种异常，需要单调读。"
+  },
+  {
+   "num": "6-5",
+   "src": "assets/fig/ddia_0605.png",
+   "caption": "如果某些分片的复制速度慢于其他分片，观察者可能先看到答案，后看到问题。"
+  },
+  {
+   "num": "6-6",
+   "src": "assets/fig/ddia_0606.png",
+   "caption": "跨多个地区的多主复制。"
+  },
+  {
+   "num": "6-7",
+   "src": "assets/fig/ddia_0607.png",
+   "caption": "多主复制可以采用的三种拓扑示例。"
+  },
+  {
+   "num": "6-8",
+   "src": "assets/fig/ddia_0608.png",
+   "caption": "在多主复制中，写入抵达某些副本的顺序可能有误。"
+  },
+  {
+   "num": "6-9",
+   "src": "assets/fig/ddia_0609.png",
+   "caption": "两个领导者并发更新同一条记录，造成写入冲突。"
+  },
+  {
+   "num": "6-10",
+   "src": "assets/fig/ddia_0610.png",
+   "caption": "亚马逊购物车异常示例：以并集方式合并购物车冲突时，已删除的商品可能重新出现。"
+  },
+  {
+   "num": "6-11",
+   "src": "assets/fig/ddia_0611.png",
+   "caption": "OT 与 CRDT 分别如何合并字符串中的两次并发插入。"
+  },
+  {
+   "num": "6-12",
+   "src": "assets/fig/ddia_0612.png",
+   "caption": "节点停机后的仲裁写、仲裁读和读修复。"
+  },
+  {
+   "num": "6-13",
+   "src": "assets/fig/ddia_0613.png",
+   "caption": "如果 w + r > n，读取的 r 个副本中至少有一个必然见过最近一次成功写入。"
+  },
+  {
+   "num": "6-14",
+   "src": "assets/fig/ddia_0614.png",
+   "caption": "Dynamo 风格数据存储中的并发写入没有明确定义的顺序。"
+  },
+  {
+   "num": "6-15",
+   "src": "assets/fig/ddia_0615.png",
+   "caption": "捕获两个客户端并发编辑购物车时的因果依赖。"
+  },
+  {
+   "num": "6-16",
+   "src": "assets/fig/ddia_0616.png",
+   "caption": "图 6-15 中因果依赖关系的图示。"
+  }
+ ],
+ "7": [
+  {
+   "num": "7-1",
+   "src": "assets/fig/ddia_0701.png",
+   "caption": "复制与分片结合使用：每个节点对某些分片充当领导者，对另一些分片充当追随者。"
+  },
+  {
+   "num": "7-2",
+   "src": "assets/fig/ddia_0702.png",
+   "caption": "印刷版百科全书按键范围分片。"
+  },
+  {
+   "num": "7-3",
+   "src": "assets/fig/ddia_0703.png",
+   "caption": "通过对键进行哈希并取模节点数来将键分配给节点。更改节点数会导致许多键从一个节点移动到另一个节点。"
+  },
+  {
+   "num": "7-4",
+   "src": "assets/fig/ddia_0704.png",
+   "caption": "向每个节点有多个分片的数据库集群添加新节点。"
+  },
+  {
+   "num": "7-5",
+   "src": "assets/fig/ddia_0705.png",
+   "caption": "为每个分片分配连续的哈希值范围。"
+  },
+  {
+   "num": "7-6",
+   "src": "assets/fig/ddia_0706.png",
+   "caption": "Cassandra 和 ScyllaDB 将可能的哈希值范围（这里是 0–1023）拆成边界随机的连续区间，并为每个节点分配多个区间。"
+  },
+  {
+   "num": "7-7",
+   "src": "assets/fig/ddia_0707.png",
+   "caption": "将请求路由到正确节点的三种不同方式。"
+  },
+  {
+   "num": "7-8",
+   "src": "assets/fig/ddia_0708.png",
+   "caption": "使用 ZooKeeper 跟踪分片到节点的分配。"
+  },
+  {
+   "num": "7-9",
+   "src": "assets/fig/ddia_0709.png",
+   "caption": "本地二级索引：每个分片只索引其自己分片内的记录。"
+  },
+  {
+   "num": "7-10",
+   "src": "assets/fig/ddia_0710.png",
+   "caption": "全局二级索引反映来自所有分片的数据，并且本身按索引值进行分片。"
+  }
+ ],
+ "8": [
+  {
+   "num": "8-1",
+   "src": "assets/fig/ddia_0801.png",
+   "caption": "两个客户端并发递增计数器之间的竞态条件。"
+  },
+  {
+   "num": "8-2",
+   "src": "assets/fig/ddia_0802.png",
+   "caption": "违反隔离性：一个事务读取另一个事务的未提交写入（“脏读”）。"
+  },
+  {
+   "num": "8-3",
+   "src": "assets/fig/ddia_0803.png",
+   "caption": "原子性确保如果发生错误，该事务的任何先前写入都会被撤消，以避免不一致的状态。"
+  },
+  {
+   "num": "8-4",
+   "src": "assets/fig/ddia_0804.png",
+   "caption": "没有脏读：用户 2 只有在用户 1 的事务提交后才能看到 x 的新值。"
+  },
+  {
+   "num": "8-5",
+   "src": "assets/fig/ddia_0805.png",
+   "caption": "发生脏写时，不同事务的冲突写入可能混杂在一起。"
+  },
+  {
+   "num": "8-6",
+   "src": "assets/fig/ddia_0806.png",
+   "caption": "读偏差：Aaliyah 观察到了数据库的不一致状态。"
+  },
+  {
+   "num": "8-7",
+   "src": "assets/fig/ddia_0807.png",
+   "caption": "使用多版本并发控制实现快照隔离。"
+  },
+  {
+   "num": "8-8",
+   "src": "assets/fig/ddia_0808.png",
+   "caption": "写偏差导致应用程序错误的示例。"
+  },
+  {
+   "num": "8-9",
+   "src": "assets/fig/ddia_0809.png",
+   "caption": "交互式事务与存储过程的差异（采用图 8-8中的示例事务）。"
+  },
+  {
+   "num": "8-10",
+   "src": "assets/fig/ddia_0810.png",
+   "caption": "检测事务何时从 MVCC 快照读取过时值。"
+  },
+  {
+   "num": "8-11",
+   "src": "assets/fig/ddia_0811.png",
+   "caption": "在可串行化快照隔离中，检测一个事务何时修改了另一个事务读过的数据。"
+  },
+  {
+   "num": "8-12",
+   "src": "assets/fig/ddia_0812.png",
+   "caption": "当事务涉及多个数据库节点时，它可能在某些节点上提交，在其他节点上失败。"
+  },
+  {
+   "num": "8-13",
+   "src": "assets/fig/ddia_0813.png",
+   "caption": "两阶段提交（2PC）的成功执行。"
+  },
+  {
+   "num": "8-14",
+   "src": "assets/fig/ddia_0814.png",
+   "caption": "参与者投票“是”之后，协调者崩溃。数据库 1 不知道该提交还是中止。"
+  }
+ ],
+ "9": [
+  {
+   "num": "9-1",
+   "src": "assets/fig/ddia_0901.png",
+   "caption": "发出请求却没有收到响应时，无法分辨究竟是 (a) 请求丢失、(b) 远程节点宕机，还是 (c) 响应丢失。"
+  },
+  {
+   "num": "9-2",
+   "src": "assets/fig/ddia_0902.png",
+   "caption": "多台机器向同一个目的地发送网络流量时，交换机队列可能被塞满。图中端口 1、2 和 4 都在尝试向端口 3 发送数据包。"
+  },
+  {
+   "num": "9-3",
+   "src": "assets/fig/ddia_0903.png",
+   "caption": "客户端 B 的写入在因果关系上晚于客户端 A 的写入，但 B 的写入具有更早的时间戳。"
+  },
+  {
+   "num": "9-4",
+   "src": "assets/fig/ddia_0904.png",
+   "caption": "分布式锁的错误实现：租约已经过期，客户端 1 却认为它依然有效，因而损坏了存储中的文件。"
+  },
+  {
+   "num": "9-5",
+   "src": "assets/fig/ddia_0905.png",
+   "caption": "原租约持有者发出的消息可能延迟很久，直到另一个节点接管租约后才抵达。"
+  },
+  {
+   "num": "9-6",
+   "src": "assets/fig/ddia_0906.png",
+   "caption": "只允许写入按照递增的栅栏令牌顺序执行，从而保证存储访问安全。"
+  },
+  {
+   "num": "9-7",
+   "src": "assets/fig/ddia_0907.png",
+   "caption": "使用栅栏令牌保护对无主复制数据库的写入。"
+  }
+ ]
+}

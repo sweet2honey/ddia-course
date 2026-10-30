@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全书速查 · 数据密集型应用系统设计</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body class="sheet">
+<main class="page">
+
+<p class="crumb">速查 · 全书一页纸 · 14 章</p>
+
+<h1>全书速查</h1>
+<p class="standfirst">面试前十分钟看的那张纸。六张对照表、一棵分片决策树、一份银弹失效边界、一套评审追问清单。每一格都对应书里的一处论证，标了章号，随时能回去核。</p>
+
+<h2>〇 · 一条主线</h2>
+<p style="font-family:var(--sans);font-size:0.95rem;">
+  没有解决方案，只有权衡取舍 → 先问<strong>约束</strong>（数据量、延迟预算、故障模型、谁能等） → 再问<strong>选型</strong>（复制／分片／模型／存储引擎） → 然后必须说出<strong>放弃了哪条不变式</strong> → 最后给出<strong>失效时的现象与监控指标</strong>。四步缺一步，这段设计就还不能进评审文档。
+</p>
+
+<p class="lead-in">第 2 章给出的三个非功能维度，是后面所有取舍的坐标系：</p>
+<ol>
+  <li><strong>可靠性（reliability）</strong>：出故障时还能正确工作。故障 ≠ 失效；容错是让故障不变成失效。</li>
+  <li><strong>可伸缩性（scalability）</strong>：负载涨了还有合理办法应对。先量化负载，再谈「可扩展」。</li>
+  <li><strong>可维护性（maintainability）</strong>：可运维、简单、可演化。这是唯一一项你每天都要付利息的。</li>
+</ol>
+
+<h2>一 · 一致性谱系（从弱到强）</h2>
+<p class="lead-in">「强一致」不是一个词，是一族词。评审里说错档位，等于没说。下表每行的「代价」列才是被追问时的答案。</p>
+
+<table>
+  <thead><tr><th>保证</th><th>承诺什么</th><th>典型实现</th><th>代价 / 失效现象</th></tr></thead>
+  <tbody>
+    <tr><td>最终一致<br><span class="term">eventual</span></td><td>停止写入后，副本终将收敛到同一值。</td><td>异步复制、无主 + 提示移交</td><td>「最终」没有上界；读到的旧值无法自证是旧的。<span class="term">ch6</span></td></tr>
+    <tr><td>读己之写<br><span class="term">read-your-writes</span></td><td>用户总能看到自己刚提交的写入。</td><td>写后读主库、按用户粘会话、记住自己的时间戳</td><td>跨设备/跨账号失效；换设备就退回旧值。<span class="term">ch6</span></td></tr>
+    <tr><td>单调读<br><span class="term">monotonic reads</span></td><td>看到某一时刻后，不会又看到更早的时刻。</td><td>按用户哈希固定副本</td><td>副本故障切换时会破；需要重新固定。<span class="term">ch6</span></td></tr>
+    <tr><td>一致前缀读<br><span class="term">consistent prefix</span></td><td>因果相关的写入，按因果顺序被看到（问题在回答之前）。</td><td>把有因果的写入放同一分片、用逻辑时钟排序</td><td>跨分片就破；「因果」需要显式携带。<span class="term">ch6</span></td></tr>
+    <tr><td>因果一致<br><span class="term">causal</span></td><td>所有节点按同一因果序观察事件；并发事件可不一致。</td><td>版本向量、Lamport 时钟</td><td>元数据随客户端增长；并发写仍要合并策略。<span class="term">ch6</span></td></tr>
+    <tr><td>线性一致<br><span class="term">linearizable</span></td><td>表现得像只有一份副本，且每次读写瞬时原子生效。</td><td>单主 + 同步复制、共识（Raft/Paxos）、单节点自增 ID</td><td>响应时间至少与网络延迟抖动成正比（Attiya–Welch）；分区期间不可用。<span class="term">ch10</span></td></tr>
+  </tbody>
+</table>
+
+<div class="diag">
+  <p><strong>被问「你们是强一致吗」，正确答法不是「是/不是」，是报档位：</strong></p>
+  <p>「我们的读是<em>最终一致</em>，延迟上界 p99 约 200ms；对账场景额外加一条<em>读己之写</em>，靠写后 1 秒内读主库实现；跨分片的转账依赖<em>线性一致</em>的租约服务发号，这里分区时会拒绝写入而不是返回旧值。」</p>
+  <p>三句话里出现了三个不同档位、一个数字、一个分区时的行为选择——这就是「能被追问」的样子。</p>
+</div>
+
+<h2>二 · 隔离级别对照</h2>
+<p class="lead-in">表 8-1 的完整版。✓ 防止，✗ 可能发生，? 视实现。这张表是第 8 章全部论证的压缩。</p>
+
+<table>
+  <thead><tr><th>隔离级别</th><th>脏读</th><th>读偏斜</th><th>幻读</th><th>丢失更新</th><th>写偏斜</th></tr></thead>
+  <tbody>
+    <tr><td>读未提交<br><span class="term">read uncommitted</span></td><td>✗ 可能</td><td>✗ 可能</td><td>✗ 可能</td><td>✗ 可能</td><td>✗ 可能</td></tr>
+    <tr><td>读已提交<br><span class="term">read committed</span></td><td>✓ 防止</td><td>✗ 可能</td><td>✗ 可能</td><td>✗ 可能</td><td>✗ 可能</td></tr>
+    <tr><td>快照隔离 / 可重复读<br><span class="term">snapshot</span></td><td>✓ 防止</td><td>✓ 防止</td><td>✓ 防止</td><td>? 视情况</td><td>✗ 可能</td></tr>
+    <tr><td>可串行化<br><span class="term">serializable</span></td><td>✓ 防止</td><td>✓ 防止</td><td>✓ 防止</td><td>✓ 防止</td><td>✓ 防止</td></tr>
+  </tbody>
+</table>
+
+<div class="two">
+<div>
+<h3>可串行化的三种实现</h3>
+<ul>
+  <li><strong>实际串行执行</strong>：单线程逐个跑，全内存 + 存储过程。吞吐上限 = 单核；适合分片后的事务。VoltDB、Redis 的路子。</li>
+  <li><strong>两阶段锁（2PL）</strong>：读写都加锁并持有到提交。能防一切，但写会阻塞读，死锁要检测；尾延迟最差。<span class="term">MySQL 8 前</span></li>
+  <li><strong>可串行化快照隔离（SSI）</strong>：乐观，提交时检查读写依赖，冲突则中止。不阻塞，但冲突率高时重试放大。<span class="term">PostgreSQL</span></li>
+</ul>
+</div>
+<div>
+<h3>四个最常被漏掉的异常</h3>
+<ul>
+  <li><strong>丢失更新</strong>：读—改—写循环互相覆盖。修法：`SELECT FOR UPDATE`、原子自增、或让更新带上旧值做 CAS。</li>
+  <li><strong>写偏斜</strong>：两个事务各读一部分、各写另一部分，前提都成立但结论互斥（双医生同时请假）。修法：显式加锁或可串行化。</li>
+  <li><strong>读偏斜</strong>：同一次事务里两次读看到不同快照（转账前后看到中间态）。修法：快照隔离。</li>
+  <li><strong>幻读</strong>：查询条件的结果集被别人插入改变。修法：索引范围锁。</li>
+</ul>
+</div>
+</div>
+
+<h2>三 · 复制方案对照</h2>
+<table>
+  <thead><tr><th>方案</th><th>写入落在哪</th><th>读从哪来</th><th>冲突 / 收敛</th><th>什么时候选</th></tr></thead>
+  <tbody>
+    <tr><td>单主<br><span class="term">leader-based</span></td><td>唯一领导者</td><td>任意副本（可能陈旧）</td><td>无冲突；切换时可能丢最近写入</td><td>默认选项。写入不跨地域、能接受切换暂停。</td></tr>
+    <tr><td>多主<br><span class="term">multi-leader</span></td><td>任一领导者</td><td>本地领导者（低延迟）</td><td>必须解冲突：LWW / 版本向量 / CRDT / 人工</td><td>多地域写入、离线优先（local-first）、协作编辑。</td></tr>
+    <tr><td>无主<br><span class="term">leaderless</span></td><td>客户端并发写 w 个</td><td>并发读 r 个 + 读修复</td><td>版本向量检测并发；提示移交补漏</td><td>要高可用、能容忍弱一致。Cassandra / DynamoDB / Riak。</td></tr>
+  </tbody>
+</table>
+
+<div class="diag">
+  <p><strong>仲裁（quorum）的三条硬事实：</strong></p>
+  <p>① <code>w + r &gt; n</code> 才保证读写集合相交；取多数（&gt; n/2）能同时容忍 ⌊n/2⌋ 个节点失效。</p>
+  <p>② <code>w + r &gt; n</code> <em>不等于</em>线性一致：节点从旧副本恢复、再平衡期间节点对 n 的组成看法不一、写部分成功不回滚、时钟快的节点静默丢写——任意一条都能打破它。</p>
+  <p>③ 调小 w/r 换的是延迟和可用性，不是「更好的性能」，代价是更容易读到陈旧值。</p>
+</div>
+
+<h2>四 · 分片决策树</h2>
+<div class="diag">
+  <p><strong>① 真的需要分片吗？</strong><br>单机能扛住数据量与写入吞吐？扛得住就别分——分片是重量级方案，只有大规模才值得。读吞吐不够先用读副本，不是分片。</p>
+  <p><strong>② 分区键选谁？</strong><br>选那个「几乎每个查询都带着它」的字段。键选错：跨分片查询 + 未来难改。</p>
+  <p><strong>③ 范围还是哈希？</strong><br>范围分片：扫描友好、热点风险高（时间戳/自增 ID 天然热点）。哈希分片：均匀、丢范围扫描。折中：复合键（前缀哈希 + 后缀排序）。</p>
+  <p><strong>④ 热点怎么办？</strong><br>加随机后缀拆键、应用层缓存、或把热键单独拎出来。倾斜（skew）是分布问题，不是负载问题。</p>
+  <p><strong>⑤ 再平衡谁来定？</strong><br>全自动方便但会和自动失效检测叠加成级联失效（过载→误判死→迁数据→更过载）。有人工确认这一步的折中通常最稳。</p>
+  <p><strong>⑥ 二级索引怎么切？</strong><br>本地索引（按文档分区）：写只碰一个分片，读要扇出所有分片 + 尾部延迟放大。全局索引（按词项分区）：读单分片，写要跨分片原子更新。二选一，没有免费的。</p>
+</div>
+
+<h2>五 · 批与流</h2>
+<div class="two">
+<div>
+<h3>批处理</h3>
+<ul>
+  <li><strong>定义性质</strong>：有界输入、可重跑、幂等。错了重跑一遍就对了——这是它最大的运维红利。</li>
+  <li><strong>代价</strong>：延迟以小时/天计；输出是快照，不是状态。</li>
+  <li><strong>关键机制</strong>：分布式文件系统（数据本地性）、shuffle（排序落盘）、数据流引擎（DAG 而非 Map→Reduce 两步）。</li>
+  <li><strong>用在</strong>：ETL、训练集、全量重建索引、对外提供衍生数据。</li>
+</ul>
+</div>
+<div>
+<h3>流处理</h3>
+<ul>
+  <li><strong>定义性质</strong>：无界输入、持续运行；正确性靠「可重放 + 幂等 + 去重」，不是靠事务。</li>
+  <li><strong>代价</strong>：状态要持久化，迟到数据要处理，顺序要自己扛。</li>
+  <li><strong>关键机制</strong>：日志式代理（保留 + 重放）、CDC、事件时间窗口 + 水位线、恰好一次 = 至少一次投递 + 幂等去重。</li>
+  <li><strong>用在</strong>：派生视图、缓存失效、跨系统同步、实时指标。</li>
+</ul>
+</div>
+</div>
+
+<div class="diag">
+  <p><strong>「恰好一次（exactly-once）」到底保证了什么：</strong>保证的是<em>效果</em>恰好一次，不是<em>投递</em>恰好一次。实现方式必定是「至少一次投递 + 接收端幂等 / 去重表 / 事务性写偏移」三者之一。所以它只在<strong>端到端</strong>范围内成立——中间任何一个环节把消息重放了却不去重，这个保证就没了。ch12 / ch13</p>
+</div>
+
+<h2>六 · 银弹失效边界</h2>
+<table>
+  <thead><tr><th>方案</th><th>它解决什么</th><th>在哪失效</th></tr></thead>
+  <tbody>
+    <tr><td>事务</td><td>把并发与部分故障收成一次中止</td><td>跨异构存储的 2PC 对协调者故障极敏感；弱隔离下写偏斜照旧。</td></tr>
+    <tr><td>2PC</td><td>多节点原子提交</td><td>协调者崩溃后参与者持锁等待；启发式决策破坏原子性。</td></tr>
+    <tr><td>CRDT</td><td>并发写自动收敛，无需协调</td><td>只对特定数据类型成立；元数据随副本数增长；语义上「合并」未必符合业务。</td></tr>
+    <tr><td>幂等消费者</td><td>重试安全</td><td>需要稳定的去重键；去重表本身会无限增长，要窗口化。</td></tr>
+    <tr><td>CDC</td><td>把数据库变更变成流</td><td>模式演化会让下游解析失败；顺序依赖单分区；快照 + 增量切换点容易漏。</td></tr>
+    <tr><td>共识（Raft/Paxos）</td><td>线性一致的复制状态机</td><td>每次写入至少一次往返多数派；跨地域部署延迟直接翻倍；只保护经由它的状态。</td></tr>
+    <tr><td>分布式锁 / 租约</td><td>互斥</td><td>进程暂停（GC、换页）会让持锁者「假活」；必须配栅栏令牌（fencing token）。</td></tr>
+  </tbody>
+</table>
+
+<h2>七 · 评审追问清单</h2>
+<p class="lead-in">拿到一份设计文档，按顺序问。前四问答不上来，后面的不用问。</p>
+<table>
+  <thead><tr><th>#</th><th>问什么</th><th>好答案长的样子</th><th>章</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>数据量、写入速率、读写比？峰值是多少？</td><td>具体数字 + 峰值与均值的倍数</td><td>2</td></tr>
+    <tr><td>2</td><td>延迟预算是多少？是 p50 还是 p99？</td><td>分位数 + 尾部放大来源</td><td>2</td></tr>
+    <tr><td>3</td><td>你假设的故障模型是什么？</td><td>崩溃恢复 / 网络分区 / 时钟漂移 / 拜占庭，选哪个不选哪个</td><td>9</td></tr>
+    <tr><td>4</td><td>这个读是哪个一致性档位？</td><td>报档位 + 数字 + 分区时行为</td><td>6, 10</td></tr>
+    <tr><td>5</td><td>写跨几个分片？失败了怎么补偿？</td><td>单分片 / 分布式事务 / 幂等重试，三选一说明</td><td>7, 8</td></tr>
+    <tr><td>6</td><td>模式（schema）怎么演化？旧版本消费者怎么办？</td><td>前向/后向兼容策略 + 谁读谁写</td><td>5</td></tr>
+    <tr><td>7</td><td>切换（failover）时丢多少数据？</td><td>同步/异步 + 最近 N 秒 + 脑裂防护</td><td>6, 9</td></tr>
+    <tr><td>8</td><td>这套衍生数据错了，怎么发现、怎么重建？</td><td>可重跑 + 对账 + 校验和</td><td>11, 12, 13</td></tr>
+    <tr><td>9</td><td>哪个指标先报警？它对应哪条不变式？</td><td>复制延迟 / 冲突率 / 消费者滞后 / 去重表大小</td><td>2, 6, 12</td></tr>
+    <tr><td>10</td><td>「为什么不选 X」——X 强在哪、什么条件下翻盘？</td><td>双向代价 + 翻盘的规模或故障条件</td><td>全书</td></tr>
+  </tbody>
+</table>
+
+<h2>八 · 常见误用</h2>
+<div class="two">
+<ul>
+  <li><strong>「CAP 三选二」。</strong>错。分区不是选项，是必然发生；正确说法是「分区期间要么一致要么可用」。CAP 已被更精确的结果取代，如今只剩历史意义。<span class="term">ch10</span></li>
+  <li><strong>「用了 ACID 数据库就没有并发问题」。</strong>错。多数「ACID」数据库默认是读已提交或快照隔离，写偏斜照旧发生。<span class="term">ch8</span></li>
+  <li><strong>「最终一致 = 弱，无所谓」。</strong>错。最终一致必须能量化「最终」有多远，否则不可运维。<span class="term">ch6</span></li>
+  <li><strong>「复制延迟是运维问题」。</strong>错。它是应用要显式处理的一致性模型问题。</li>
+</ul>
+<ul>
+  <li><strong>「分片能提升查询吞吐」。</strong>不一定。扇出到所有分片的查询，加节点只会让尾延迟更糟。<span class="term">ch7</span></li>
+  <li><strong>「批处理过时了，都上流」。</strong>错。批处理的「可重跑」是别的方案换不来的，很多流系统靠批补历史。<span class="term">ch13</span></li>
+  <li><strong>「事务慢，所以不用事务」。</strong>先看慢在哪：是锁、是 2PC 往返、还是磁盘 fsync。三者代价差一个量级。<span class="term">ch8</span></li>
+  <li><strong>「时钟大致准就够了」。</strong>错。跨节点排序、租约、LWW 冲突解决都建立在时钟上，一次 NTP 跳变就能让顺序反转。<span class="term">ch9</span></li>
+</ul>
+</div>
+
+<h2>九 · 一句话带走</h2>
+<div class="key">
+<p>每次评审只做一件事：把「我们用了 X」改写成「<strong>在约束 C 下，我们选了 X，放弃了不变式 I，失效时表现为 P，监控指标是 M</strong>」。五个空填不满，这个决策就还没想清楚。</p>
+</div>
+
+<div class="foot">
+  <p>14 课全部入口见 <a href="../index.html">课程目录</a>；术语定义见 <a href="glossary.html">术语表</a>。这张纸的可打印版本就是本页（浏览器打印为 A4 双栏）。</p>
+  <p>原文：<a href="https://ddia.vonng.com/">《数据密集型应用系统设计》第二版中文全译</a>；英文原书信息见 <a href="https://dataintensive.net/">dataintensive.net</a>。</p>
+</div>
+
+</main>
+</body>
+</html>
