@@ -178,7 +178,18 @@ blockquote cite {
   gap: 1rem;
   margin: 1.4rem 0;
 }
+
+/* 三条路线并排：三列，中屏两列，窄屏一列。
+   路线卡自带课序清单，所以列宽不能再压——900px 以下就降成两列。 */
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.4rem 0;
+}
+@media (max-width: 900px) { .grid3 { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) {
+  .grid3 { grid-template-columns: 1fr; }
   .grid2 { grid-template-columns: 1fr; }
   body { font-size: 16.5px; }
   h1 { font-size: 1.7rem; }
@@ -365,6 +376,88 @@ tbody tr:last-child td { border-bottom: none; }
   color: var(--ink-faint);
   margin: -0.4rem 0 0.9rem;
 }
+
+/* ---- 路线卡（首页的三条读法）---- */
+.card .route-for {
+  font-family: var(--sans);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--accent);
+  margin: 0 0 0.7rem;
+  text-wrap: pretty;
+}
+.card .route-meta {
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin: 0 0 0.85rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--rule);
+}
+.card .route-meta span + span::before { content: " · "; }
+.card ol.route-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.9rem;
+  font-family: var(--sans);
+  font-size: 0.87rem;
+  line-height: 1.5;
+}
+.card ol.route-list li {
+  margin: 0;
+  padding: 0.18rem 0 0.18rem 1.9rem;
+  text-indent: -1.9rem;
+}
+.card ol.route-list li + li { border-top: 1px dotted var(--rule); }
+.card ol.route-list .no {
+  display: inline-block;
+  width: 1.55rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  text-indent: 0;
+}
+/* 路线里的课名是链接：点击区尽量宽，但不撑破 text-indent 的悬挂缩进 */
+.card ol.route-list a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ink-faint);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.12s, text-decoration-color 0.12s;
+}
+.card ol.route-list a:hover {
+  color: var(--link);
+  text-decoration-color: var(--link);
+}
+.card ol.route-list a:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+@media print {
+  .card ol.route-list a { text-decoration: none; }
+}
+.card .route-q,
+.card .route-miss {
+  font-family: var(--sans);
+  font-size: 0.84rem;
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+}
+.card .route-q b,
+.card .route-miss b {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.1rem;
+}
+.card .route-miss { color: var(--ink-soft); }
+.card .route-miss b { color: var(--bad); }
+@media print { .grid3 { grid-template-columns: 1fr 1fr !important; } }
 
 /* ---- 术语表 ---- */
 .gloss { margin: 2rem 0; }

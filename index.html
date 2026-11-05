@@ -16,23 +16,78 @@
 <p><strong>贯穿全书的那句话：</strong>没有解决方案，只有权衡取舍。每一个「我们用了 X」后面都跟着一条你放弃了的不变式。说不出放弃了什么，就不知道自己赌了什么。</p>
 </div>
 
-<h2><span class="num">路线</span>三条读法，任选一条</h2>
+<h2><span class="num">路线</span>三种场景，三条最小路径</h2>
 
-<div class="grid2">
+<p class="lead-in">先花半小时把地基打完，再挑一条走。时长按 400 汉字/分钟估，取到 0.5 小时。</p>
+
 <div class="card">
-<h4>按痛点读（推荐先走这条）</h4>
-<p>你的三个真实问题各自对应哪几课：</p>
-<ul>
-<li><strong>面试被追问就崩</strong><br>L6 复制延迟三种保证 → L8 隔离级别 → L10 一致性谱系 → L13 端到端原则</li>
-<li><strong>评审写不出可被追问的取舍</strong><br>L2 非功能需求量化 → L7 分片与再平衡 → L11/L12 批与流的边界</li>
-<li><strong>选型靠跟风</strong><br>L4 存储引擎代价 → L5 模式演化 → L9 故障模型 → L10 共识的成本</li>
-</ul>
+<h4>共同起点 · 约 0.5 小时</h4>
+<p>三条路线都从这里开始。这两课定下后面所有章节的坐标系：你在优化哪个指标、谁的数据是权威版本。</p>
+<ol class="route-list">
+  <li><span class="no">L1</span><a href="lessons/0001-tradeoffs-in-data-systems.html">数据系统架构中的权衡</a></li>
+  <li><span class="no">L2</span><a href="lessons/0002-nonfunctional-requirements.html">定义非功能性需求</a></li>
+</ol>
+<p class="route-q"><b>读完你能</b>把「这个系统慢 / 不稳 / 不好扩展」拆成可测量的指标和具体的失效，而不是一堆形容词。</p>
+<p class="route-miss"><b>跳过会漏</b>分不清记录系统与衍生数据，就会在评审时把「缓存不一致」当成 bug，而它是这份设计的必然结果。</p>
 </div>
+
+<div class="grid3">
+
 <div class="card">
-<h4>按章号读（从头到尾）</h4>
-<p>书本身有论证顺序：Part I（1–5）打单机与数据模型的地基，Part II（6–10）是分布式代价的完整清单，Part III（11–14）讲衍生数据，以及「集成多套系统」这件事该怎么做。14 课按章号排下来，就是作者的推理链。</p>
-<p>赶时间的读法：L2、L6、L7、L8、L10 五课覆盖面试里 80% 的追问。只看一课时选 L8。</p>
+<h4>路线一 · 从单机进阶到分布式</h4>
+<p class="route-for">你写的是单机服务，想知道什么时候必须拆、拆了之后要接手哪些代价。</p>
+<p class="route-meta"><span>约 2 小时</span><span>共 7 课</span></p>
+<ol class="route-list">
+  <li><span class="no">L1</span><a href="lessons/0001-tradeoffs-in-data-systems.html">数据系统架构中的权衡</a></li>
+  <li><span class="no">L2</span><a href="lessons/0002-nonfunctional-requirements.html">定义非功能性需求</a></li>
+  <li><span class="no">L4</span><a href="lessons/0004-storage-and-retrieval.html">存储与检索</a></li>
+  <li><span class="no">L5</span><a href="lessons/0005-encoding-and-evolution.html">编码与演化</a></li>
+  <li><span class="no">L6</span><a href="lessons/0006-replication.html">复制</a></li>
+  <li><span class="no">L9</span><a href="lessons/0009-trouble-with-distributed-systems.html">分布式系统的麻烦</a></li>
+  <li><span class="no">L10</span><a href="lessons/0010-consistency-and-consensus.html">一致性与共识</a></li>
+</ol>
+<p class="route-q"><b>读完你能</b>判断一个系统是否到了该拆分布式的时候，以及拆完之后复制、编码演进、时钟与共识的代价各落在谁身上。</p>
+<p class="route-miss"><b>跳过会漏</b>写放大怎么把写吞吐换算成磁盘带宽，评审时就说不出存储引擎的成本；也会漏掉「超时不是失败」，把所有重试都写成重复扣款。</p>
 </div>
+
+<div class="card">
+<h4>路线二 · 决策选型</h4>
+<p class="route-for">手上有一个真实系统要定方案，需要的是「选 A 还是选 B」的判据。</p>
+<p class="route-meta"><span>约 2.5 小时</span><span>共 8 课</span></p>
+<ol class="route-list">
+  <li><span class="no">L1</span><a href="lessons/0001-tradeoffs-in-data-systems.html">数据系统架构中的权衡</a></li>
+  <li><span class="no">L2</span><a href="lessons/0002-nonfunctional-requirements.html">定义非功能性需求</a></li>
+  <li><span class="no">L3</span><a href="lessons/0003-data-models-and-query-languages.html">数据模型与查询语言</a></li>
+  <li><span class="no">L4</span><a href="lessons/0004-storage-and-retrieval.html">存储与检索</a></li>
+  <li><span class="no">L7</span><a href="lessons/0007-sharding.html">分片</a></li>
+  <li><span class="no">L8</span><a href="lessons/0008-transactions.html">事务</a></li>
+  <li><span class="no">L12</span><a href="lessons/0012-stream-processing.html">流处理</a></li>
+  <li><span class="no">L11</span><a href="lessons/0011-batch-processing.html">批处理</a></li>
+</ol>
+<p class="route-q"><b>读完你能</b>为数据模型、存储引擎、分区键、隔离级别、批还是流这五次拍板各写出一句带代价的理由。</p>
+<p class="route-miss"><b>跳过会漏</b>分片键一选错就锁死两年；也会漏掉批处理「可重跑」这个别的方案换不来的性质，把衍生数据的重建能力当成可选项。</p>
+</div>
+
+<div class="card">
+<h4>路线三 · 评审别人的方案</h4>
+<p class="route-for">手上有一份设计文档要你给意见，需要知道该问什么、以及对方答不上来时意味着什么。</p>
+<p class="route-meta"><span>约 2 小时</span><span>共 6 课</span></p>
+<ol class="route-list">
+  <li><span class="no">L1</span><a href="lessons/0001-tradeoffs-in-data-systems.html">数据系统架构中的权衡</a></li>
+  <li><span class="no">L2</span><a href="lessons/0002-nonfunctional-requirements.html">定义非功能性需求</a></li>
+  <li><span class="no">L6</span><a href="lessons/0006-replication.html">复制</a></li>
+  <li><span class="no">L8</span><a href="lessons/0008-transactions.html">事务</a></li>
+  <li><span class="no">L10</span><a href="lessons/0010-consistency-and-consensus.html">一致性与共识</a></li>
+  <li><span class="no">L13</span><a href="lessons/0013-philosophy-of-streaming-systems.html">流式系统的哲学</a></li>
+</ol>
+<p class="route-q"><b>读完你能</b>把「我们用 Redis 缓存 + 主从复制 + 最终一致」这句话拆成六条可追问的承诺，并指出哪一条没被验证。</p>
+<p class="route-miss"><b>跳过会漏</b>「最终一致」和「永远不一致」的区别：把完整性破坏也写进「最终会好」，是评审里最贵的一处误判。</p>
+</div>
+
+</div>
+
+<div class="diag">
+<p><strong>路线之外 · L14「做正确的事情」（约 0.5 小时）</strong>　这一课不讲技术，讲你的系统会怎么影响人：预测分析的反馈回路、隐私与追踪、数据最小化在架构上长什么样。建议在真正上线一个涉及个人数据的系统之前读，而不是现在。</p>
 </div>
 
 <h2><span class="num">第一部分</span>数据系统基础（第 1–5 章）</h2>
