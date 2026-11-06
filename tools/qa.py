@@ -22,6 +22,13 @@ class Checker(HTMLParser):
                 if self.stack[i][0] == tag: del self.stack[i:]; return
         else: self.stack.pop()
 
+def glossary_ids():
+    p = os.path.join(ROOT, 'reference', 'glossary.html')
+    if not os.path.exists(p): return set()
+    return set(re.findall(r'<dt id="([^"]+)"', open(p, encoding='utf-8').read()))
+
+GLOSS_IDS = glossary_ids()
+
 def check(path):
     html = open(path, encoding='utf-8').read()
     errs = []
@@ -43,6 +50,11 @@ def check(path):
         if rel.startswith(('http','//','mailto:','#')): continue
         tgt = os.path.normpath(os.path.join(base, rel))
         if not os.path.exists(tgt): errs.append(f"相对链接失效：{rel}")
+
+    # 术语跳转锚点必须真的存在于术语表里
+    for m in re.finditer(r'href="\.\./reference/glossary\.html#([^"]+)"', html):
+        if m.group(1) not in GLOSS_IDS:
+            errs.append(f"术语锚点不存在：#%s" % m.group(1))
 
     # 组件与字数
     def n(cls): return len(re.findall(r'class="[^"]*\b%s\b[^"]*"' % cls, html))

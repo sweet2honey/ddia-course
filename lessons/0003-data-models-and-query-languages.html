@@ -12,15 +12,15 @@
 <p class="crumb"><a href="../reference/glossary.html">术语表</a> · 第 3 章 · 课程 3 / 14</p>
 
 <h1>数据模型与查询语言</h1>
-<p class="standfirst">数据模型不是一个「存哪儿」的决定，它是一次打包出售：选关系模型，你同时买下了连接能力和模式约束；选文档模型，你买下了局部性和读时模式，同时签下了「多对多自己想办法」的欠条。这一章的价值不是让你背下五种模型，而是让你在评审里说得出：这个选择往后锁死了哪几件事。</p>
+<p class="standfirst">数据模型不是一个「存哪儿」的决定，它是一次打包出售：选<a class="gref" href="../reference/glossary.html#relational-model">关系模型</a>，你同时买下了连接能力和模式约束；选<a class="gref" href="../reference/glossary.html#document-model">文档模型</a>，你买下了局部性和读时模式，同时签下了「多对多自己想办法」的欠条。这一章的价值不是让你背下五种模型，而是让你在评审里说得出：这个选择往后锁死了哪几件事。</p>
 
 <h2><span class="num">3.1</span>模型是分层套娃，每一层都在藏东西</h2>
 
 <p>应用里的数据模型是层层叠加的：应用开发者把现实世界（人、订单、传感器）建模成对象和 API；数据库把对象存成表、JSON 文档或图的顶点与边；存储引擎再把它们编码成磁盘上的字节；硬件最后把字节变成磁场或电荷。每一层的关键问题都是同一个：<strong>它是如何用下一层的数据模型来「表示」的</strong>。</p>
 
-<p>抽象的意义在这里，也在代价在这里：每一层都隐藏了下层的复杂性，因此两拨人可以分工：数据库厂商的工程师管页缓存和 B 树，应用工程师管业务对象。但当你选的模型和你的查询形状不匹配时，你无法从上层「绕过」下层：比如用文档库存一个需要反复双向查询的多对多关系，你会一直在应用代码里手写 join，而这个 join 的执行计划（索引、遍历顺序、批量化）全部由你负责，不再有优化器替你兜底。</p>
+<p>抽象的意义在这里，也在代价在这里：每一层都隐藏了下层的复杂性，因此两拨人可以分工：数据库厂商的工程师管页缓存和 <a class="gref" href="../reference/glossary.html#b-tree">B 树</a>，应用工程师管业务对象。但当你选的模型和你的查询形状不匹配时，你无法从上层「绕过」下层：比如用文档库存一个需要反复双向查询的多对多关系，你会一直在应用代码里手写 join，而这个 join 的执行计划（索引、遍历顺序、批量化）全部由你负责，不再有优化器替你兜底。</p>
 
-<p>本章比较五种模型：<strong>关系模型</strong>（relational model）、<strong>文档模型</strong>（document model）、<strong>图数据模型</strong>（graph data model）、<strong>事件溯源</strong>（event sourcing）、<strong>数据框</strong>（dataframe）。记住一条主线：模型的价值由「数据里主要是什么形状的关系」决定，而不是由厂商的营销词决定。</p>
+<p>本章比较五种模型：<strong>关系模型</strong>（relational model）、<strong>文档模型</strong>（document model）、<strong>图数据模型</strong>（graph data model）、<strong><a class="gref" href="../reference/glossary.html#event-sourcing">事件溯源</a></strong>（event sourcing）、<strong><a class="gref" href="../reference/glossary.html#dataframe">数据框</a></strong>（dataframe）。记住一条主线：模型的价值由「数据里主要是什么形状的关系」决定，而不是由厂商的营销词决定。</p>
 
 <h2><span class="num">3.2</span>关系模型的起点：一对多要靠拆表</h2>
 
@@ -35,7 +35,7 @@
 
 <p>同一份资料写成 JSON 就是一个文档，一次读取拿到全部内容：这是<strong>存储局部性</strong>（locality）带来的好处。关系模型要取回整份简历，要么按 <code>user_id</code> 查四张表再在应用里拼，要么写一条四路连接。JSON 表示则明确呈现了这棵树。一对多的数据天然是一棵树，见图 3-2。</p>
 
-<p>这里的边界必须记牢：原文用的是「一对<em>少</em>」（one-to-few）这个词。简历只有几段经历，嵌进文档合理。如果相关项目可能多到惊人（名人帖子有几十万条评论），把它们全塞进一个文档就既笨重又危险：每次加一条评论都要重写整个文档，文档越大写放大越严重。这种情况下该回到关系模型。</p>
+<p>这里的边界必须记牢：原文用的是「一对<em>少</em>」（one-to-few）这个词。简历只有几段经历，嵌进文档合理。如果相关项目可能多到惊人（名人帖子有几十万条评论），把它们全塞进一个文档就既笨重又危险：每次加一条评论都要重写整个文档，文档越大<a class="gref" href="../reference/glossary.html#write-amplification">写放大</a>越严重。这种情况下该回到关系模型。</p>
 
 <h2><span class="num">3.3</span>文档模型解决了一对多，但把多对多留给了你</h2>
 
@@ -44,11 +44,11 @@
 <p>文档库里做多对多，标准做法是两种，两种都有代价：</p>
 
 <ul>
-  <li><strong>应用层 join。</strong>先取回简历文档，从中拿到 <code>org_id</code> 列表，再发一次 <code>$in</code> 查询取组织文档，最后在代码里合并。MongoDB 的聚合管道有 <code>$lookup</code> 算子可以声明式地做这件事，但很多文档库根本不支持连接，只能手写。你要自己负责批量化（否则就是 N+1）、自己负责索引、自己负责两个查询之间数据已经变了的情况。</li>
-  <li><strong>两端都存引用（反规范化）。</strong>简历里存组织 ID，组织文档里也存简历 ID。这样两个方向都能查，但同一份关系存了两份，<strong>两边可能不一致</strong>：组织改名后，一边更新了、另一边没更新。</li>
+  <li><strong>应用层 join。</strong>先取回简历文档，从中拿到 <code>org_id</code> 列表，再发一次 <code>$in</code> 查询取组织文档，最后在代码里合并。MongoDB 的聚合管道有 <code>$lookup</code> 算子可以<a class="gref" href="../reference/glossary.html#declarative">声明式</a>地做这件事，但很多文档库根本不支持连接，只能手写。你要自己负责批量化（否则就是 N+1）、自己负责索引、自己负责两个查询之间数据已经变了的情况。</li>
+  <li><strong>两端都存引用（<a class="gref" href="../reference/glossary.html#denormalize">反规范化</a>）。</strong>简历里存组织 ID，组织文档里也存简历 ID。这样两个方向都能查，但同一份关系存了两份，<strong>两边可能不一致</strong>：组织改名后，一边更新了、另一边没更新。</li>
 </ul>
 
-<p>关系模型在这里反而是更省心的：多对多用一个<strong>关联表</strong>（associative table，也叫连接表）表示，每行只把两个 ID 关联起来，关系只存一份；再对两个 ID 列各建<strong>二级索引</strong>，就能从任意方向高效查。索引是数据库的活，不是你的活。</p>
+<p>关系模型在这里反而是更省心的：多对多用一个<strong>关联表</strong>（associative table，也叫连接表）表示，每行只把两个 ID 关联起来，关系只存一份；再对两个 ID 列各建<strong><a class="gref" href="../reference/glossary.html#secondary-index">二级索引</a></strong>，就能从任意方向高效查。索引是数据库的活，不是你的活。</p>
 
 <figure class="fig">
   <img src="../assets/fig/ddia_0305.png" alt="数据仓库中的星型模式：事实表 fact_sales 在中央，周围环绕 dim_product、dim_store 等维度表">
@@ -66,11 +66,11 @@
 <p>一般来说，规范化数据写入较快（因为只有一个副本），查询却较慢（因为需要连接）；反规范化数据通常读取较快（连接更少），写入代价却更高（要更新更多副本，也占用更多磁盘空间）。把反规范化看作一种衍生数据或许很有帮助，因为你必须建立相应流程来更新那些冗余的数据副本。</p>
 </div>
 
-<p>「必须建立相应流程」这半句是重点。反规范化不是「少写一次 join」这么简单，它把一个数据库内能保证的不变式（外键指向的行一定存在、字段一定同步）变成了一个<strong>由你的代码维护的分布式一致性问题</strong>。关系库用外键和事务守住的东西，你改用双写来守，那就得回答：写第二个副本失败怎么办？两个副本之间差多久？读到一个旧副本时业务能接受吗？</p>
+<p>「必须建立相应流程」这半句是重点。反规范化不是「少写一次 join」这么简单，它把一个数据库内能保证的不变式（外键指向的行一定存在、字段一定同步）变成了一个<strong>由你的代码维护的分布式一致性问题</strong>。关系库用外键和<a class="gref" href="../reference/glossary.html#transaction">事务</a>守住的东西，你改用双写来守，那就得回答：写第二个副本失败怎么办？两个副本之间差多久？读到一个旧副本时业务能接受吗？</p>
 
-<p>还有一个必须点出来的事实：反规范化的方案可以是<strong>部分的</strong>。X（原 Twitter）的物化时间线只存帖子 ID 和作者 ID，不存正文，也不存点赞数，因为这些数据变得太快。读的时候再用 ID 去取正文、取作者资料，这个动作叫<strong>补全 ID</strong>（hydrating IDs），本质上就是在应用层做连接。原文的判断很关键：读取时需要连接，并不会妨碍你构建高性能、可伸缩的服务；补全 ID 很适合并行，成本既不取决于你关注了多少人，也不取决于多少人关注你。</p>
+<p>还有一个必须点出来的事实：反规范化的方案可以是<strong>部分的</strong>。X（原 Twitter）的<a class="gref" href="../reference/glossary.html#materialize">物化</a>时间线只存帖子 ID 和作者 ID，不存正文，也不存点赞数，因为这些数据变得太快。读的时候再用 ID 去取正文、取作者资料，这个动作叫<strong>补全 ID</strong>（hydrating IDs），本质上就是在应用层做连接。原文的判断很关键：读取时需要连接，并不会妨碍你构建高性能、可伸缩的服务；补全 ID 很适合并行，成本既不取决于你关注了多少人，也不取决于多少人关注你。</p>
 
-<p>所以「要不要反规范化」没有统一答案，要看的是一组具体数字：<strong>被复制的那份数据变化频率多高、读路径调用几次、规模到哪一档时连接真的成为瓶颈</strong>。原文的排序是：OLTP 通常更适合规范化；分析系统更适合反规范化（批量写、只读查询为主）；中小规模规范化更省心，超大规模连接的代价才可能成为问题。</p>
+<p>所以「要不要反规范化」没有统一答案，要看的是一组具体数字：<strong>被复制的那份数据变化频率多高、读路径调用几次、规模到哪一档时连接真的成为瓶颈</strong>。原文的排序是：OLTP 通常更适合<a class="gref" href="../reference/glossary.html#normalized">规范化</a>；分析系统更适合反规范化（批量写、只读查询为主）；中小规模规范化更省心，超大规模连接的代价才可能成为问题。</p>
 
 <h2><span class="num">3.5</span>声明式 vs 命令式：把选择权交给优化器</h2>
 
@@ -115,13 +115,13 @@
   <figcaption><b>图 3-8</b> 不可变事件日志作为权威数据源，从中派生多个物化视图（也叫投影、读模型）。会议管理系统的例子：同一串事件既喂给「预订状态摘要」，也喂给「组织者仪表盘」和「胸牌打印文件」。</figcaption>
 </figure>
 
-<p>这套做法叫<strong>事件溯源</strong>（event sourcing）；配套的原则叫<strong>CQRS</strong>（Command Query Responsibility Segregation，命令查询责任分离）——写入侧处理命令、校验、产生事件，读取侧维护独立的、为查询优化的表示。两者来自领域驱动设计社区，但思想更老，分布式系统里叫<strong>状态机复制</strong>（state machine replication）。</p>
+<p>这套做法叫<strong>事件溯源</strong>（event sourcing）；配套的原则叫<strong>CQRS</strong>（Command Query Responsibility Segregation，命令查询责任分离）——写入侧处理命令、校验、产生事件，读取侧维护独立的、为查询优化的表示。两者来自领域驱动设计社区，但思想更老，分布式系统里叫<strong>状态机<a class="gref" href="../reference/glossary.html#replication">复制</a></strong>（state machine replication）。</p>
 
 <p>有一条规则必须钉死：<strong>命令与事件不同</strong>。用户请求刚到达时是命令，需要校验（座位够不够）；只有执行成功、确认有效之后，它才成为事实，事件才追加进日志。因此日志里只能有有效事件，<strong>消费日志构建视图的组件不允许拒绝事件</strong>。这一条设计对了，视图重建才有意义；设计错了，视图会带着「本来不该存在的事件」一路走下去，而且你无法修，因为权威源已经脏了。</p>
 
 <p>事件溯源最值钱的性质是<strong>可重放</strong>：随时可以删掉物化视图，用同一套代码、按同样顺序重放同样的事件，重新算出来。视图代码有 bug？删掉重算。想看某天的中间状态？从头重放到那天。这就是为什么事件日志在很多系统里同时充当审计日志——它记录的不是「现在是什么」，而是「为什么会变成这样」。</p>
 
-<p>这条线索直接通向本书后半部分：第 11 章讲批处理怎么从不可变输入重算派生数据，第 12 章讲变更数据捕获（CDC）与事件日志如何用流处理器保持视图最新，第 13 章讲「应用就是日志 + 派生视图」这个统一视角，第 10 章则要回答那个唯一的硬要求——<strong>所有视图必须按事件在日志中出现的顺序处理它们</strong>，而在分布式系统里保证全局顺序并不容易。</p>
+<p>这条线索直接通向本书后半部分：第 11 章讲<a class="gref" href="../reference/glossary.html#batch-processing">批处理</a>怎么从不可变输入重算派生数据，第 12 章讲变更数据捕获（CDC）与事件日志如何用<a class="gref" href="../reference/glossary.html#stream-processing">流处理</a>器保持视图最新，第 13 章讲「应用就是日志 + 派生视图」这个统一视角，第 10 章则要回答那个唯一的硬要求——<strong>所有视图必须按事件在日志中出现的顺序处理它们</strong>，而在分布式系统里保证全局顺序并不容易。</p>
 
 <p>缺点也要能说：涉及外部信息时结果必须确定（汇率要写进事件，或能查历史汇率，否则今天重算和昨天重算结果不同）；事件不可变与「删除个人数据」的权利（如 GDPR）冲突，只能靠每用户独立日志、把个人数据移到事件外、或用密钥加密后删密钥；重建视图时不能重放有外部副作用的操作（别每次都再发一遍确认邮件）。</p>
 
@@ -158,7 +158,7 @@
 <p>④ <strong>最隐蔽的一条：你失去了优化器。</strong>关系库里 <code>positions(user_id, org_id)</code> 两个二级索引，两个方向的查询都由数据库决定执行计划。现在你的「执行计划」写死在应用代码的循环里，数据分布变了也不会变，也没人给你做选择率估算。</p>
 </div>
 </div>
-<p>改法：<strong>把多对多还给关系模型</strong>。用一个 <code>positions</code> 关联表（<code>user_id</code>、<code>org_id</code>、<code>title</code>、<code>start</code>、<code>end</code>），对 <code>user_id</code> 和 <code>org_id</code> 各建索引；组织名和 logo 只存一份在 <code>orgs</code> 表里，个人页查询时连接取回。如果读压力确实大，再加一层<strong>可重建的</strong>物化视图（物化视图是衍生数据，随时能删了重算），而不是把它当权威数据双写。文档模型留给真正是一对多的部分：简历里的联系方式、教育经历这些「一对少」的字段。原文的结论正是这个：可伸缩性最好的方案，可能是让一部分数据反规范化，同时让另一部分保持规范化。</p>
+<p>改法：<strong>把多对多还给关系模型</strong>。用一个 <code>positions</code> 关联表（<code>user_id</code>、<code>org_id</code>、<code>title</code>、<code>start</code>、<code>end</code>），对 <code>user_id</code> 和 <code>org_id</code> 各建索引；组织名和 logo 只存一份在 <code>orgs</code> 表里，个人页查询时连接取回。如果读压力确实大，再加一层<strong>可重建的</strong>物化视图（物化视图是<a class="gref" href="../reference/glossary.html#derived-data">衍生数据</a>，随时能删了重算），而不是把它当权威数据双写。文档模型留给真正是一对多的部分：简历里的联系方式、教育经历这些「一对少」的字段。原文的结论正是这个：<a class="gref" href="../reference/glossary.html#scalability">可伸缩性</a>最好的方案，可能是让一部分数据反规范化，同时让另一部分保持规范化。</p>
 </div>
 
 <p>这个反例的通用教训：<strong>文档模型的灵活性只在一对多的树上成立</strong>。当你需要「两个方向都能查」，你面对的是多对多，需要的是一张只存一份关系、两边都有索引的表，这正好是关系模型的主场。选错模型的代价不是多写几行代码，是你要在应用层重新实现索引、连接、一致性和批量优化。</p>

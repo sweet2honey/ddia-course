@@ -166,12 +166,12 @@
 
 <div class="card">
 <h4>一、超时是一种本地调用没有的结果</h4>
-<p>本地函数要么返回、要么抛异常、要么永不返回。网络请求还有第四种：超时。超时时你<em>不知道</em>请求有没有送达。这条不确定性会一路传染到你的重试策略、幂等设计和告警口径上。</p>
+<p>本地函数要么返回、要么抛异常、要么永不返回。网络请求还有第四种：<a class="gref" href="../reference/glossary.html#timeout">超时</a>。超时时你<em>不知道</em>请求有没有送达。这条不确定性会一路传染到你的重试策略、<a class="gref" href="../reference/glossary.html#idempotent">幂等</a>设计和告警口径上。</p>
 </div>
 
 <div class="card">
 <h4>二、重试会重复执行</h4>
-<p>原请求可能已经成功，只是响应丢了。重试就让同一操作执行两次——除非协议内置去重，也就是幂等性（idempotence）。这是「恰好一次」（exactly-once）这个说法的真实来源。</p>
+<p>原请求可能已经成功，只是响应丢了。重试就让同一操作执行两次——除非协议内置去重，也就是幂等性（idempotence）。这是「<a class="gref" href="../reference/glossary.html#exactly-once">恰好一次</a>」（exactly-once）这个说法的真实来源。</p>
 </div>
 
 <div class="card">

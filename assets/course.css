@@ -470,6 +470,13 @@ tbody tr:last-child td { border-bottom: none; }
   border-top: 1px solid var(--rule);
 }
 .gloss dt:first-of-type { border-top: 0; padding-top: 0; }
+/* 从课程正文点术语跳过来时，落在哪一条要看得出来 */
+.gloss dt { scroll-margin-top: 2rem; }
+.gloss dt:target {
+  color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 0.5rem var(--accent-soft);
+}
 .gloss dd { margin: 0; }
 .gloss dd p { margin: 0 0 0.4rem; }
 .gloss .en {
@@ -629,3 +636,30 @@ tbody tr:last-child td { border-bottom: none; }
 }
 .fig figcaption b { color: var(--ink); font-weight: 700; }
 @media print { .fig { break-inside: avoid; } }
+
+/* ---- 术语首现跳转（正文里每个术语只在第一次出现处链到术语表）----
+   235 处，必须极轻：颜色随正文，只有一道很淡的点线，hover 才变色。
+   不要用透明下划线——route-list 那次试过，肉眼完全看不出来。 */
+a.gref {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--ink-faint);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.12s, text-decoration-color 0.12s;
+}
+a.gref:hover,
+a.gref:focus-visible {
+  color: var(--link);
+  text-decoration-color: var(--link);
+  text-decoration-style: solid;
+}
+a.gref:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+@media print {
+  a.gref { color: inherit; text-decoration: none; }
+}

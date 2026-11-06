@@ -23,77 +23,77 @@
 
 <div class="gloss">
 <dl>
-<dt>数据密集型<span class="en">data-intensive</span></dt>
+<dt id="data-intensive">数据密集型<span class="en">data-intensive</span></dt>
 <dd>
 <p>数据的管理方式（体量、变更传播、并发与故障下的正确性）是主要挑战的应用。对应的是计算密集型，难点在把庞大计算并行化，拼的是 FLOPS 与互连带宽。</p>
 <p class="avoid">别说成「数据量大的应用」。十 GB 也可能很数据密集，一 PB 的冷归档可能一点不密集。</p>
 <p class="see">→ <a href="../lessons/0001-tradeoffs-in-data-systems.html">L1 数据系统架构中的权衡</a></p>
 </dd>
 
-<dt>事务型系统<span class="en">OLTP · online transaction processing</span></dt>
+<dt id="oltp">事务型系统<span class="en">OLTP · online transaction processing</span></dt>
 <dd>
 <p>由创建数据的后端服务构成、按用户操作做点查询与单条增删改的系统。查询集合由应用代码预先写死，数据表示的是<em>当前状态</em>。</p>
 <p class="avoid">别理解成「小查询」。判据是访问模式（点查 + 当前状态），不是查询大小。</p>
 <p class="see">→ <a href="../lessons/0001-tradeoffs-in-data-systems.html">L1</a></p>
 </dd>
 
-<dt>分析型系统<span class="en">OLAP · online analytical processing</span></dt>
+<dt id="olap">分析型系统<span class="en">OLAP · online analytical processing</span></dt>
 <dd>
 <p>保存事务型系统的只读副本、服务分析师与数据科学的系统。典型访问是扫描海量记录做聚合，查询由人临时写、还可能由 BI 工具自动生成，数据表示的是<em>事件历史</em>。</p>
 <p class="avoid">别说「OLAP = 数据量大」。真正的差别是「查询能否预先定义」与「表示当前态还是历史」。</p>
 <p class="see">→ <a href="../lessons/0001-tradeoffs-in-data-systems.html">L1</a></p>
 </dd>
 
-<dt>记录系统<span class="en">system of record · source of truth</span></dt>
+<dt id="system-of-record">记录系统<span class="en">system of record · source of truth</span></dt>
 <dd>
 <p>持有某类数据权威版本的系统。判据只有一句：<strong>这份数据丢了，能不能从别处重新算出来？</strong>不能，它就是记录系统。</p>
 <p class="avoid">别按产品类型判断（「数据库就是记录系统，缓存就是衍生数据」）。同一个 Redis 既可能是缓存，也可能是某份配置的权威来源，取决于它在应用里怎么被用。</p>
 <p class="see">→ <a href="../lessons/0001-tradeoffs-in-data-systems.html">L1</a></p>
 </dd>
 
-<dt>衍生数据<span class="en">derived data</span></dt>
+<dt id="derived-data">衍生数据<span class="en">derived data</span></dt>
 <dd>
 <p>通过可重复流程由其他数据生成、必要时能重新计算的数据集。索引、缓存、物化视图、搜索索引、报表都属此类。技术上冗余，但为了读性能往往不可或缺。</p>
 <p class="avoid">别把「衍生」当成「不重要」。衍生数据错了要能发现、能重建，这本身是一套工程要求（对账、校验和、可重跑）。</p>
 <p class="see">→ <a href="../lessons/0001-tradeoffs-in-data-systems.html">L1</a></p>
 </dd>
 
-<dt>ETL<span class="en">extract-transform-load</span></dt>
+<dt id="extract-transform-load">ETL<span class="en">extract-transform-load</span></dt>
 <dd>
 <p>从源库抽取、转成适合分析的形式、再加载进数据仓库或批处理系统。ELT 是把转换推迟到加载之后（利用仓库自身算力），取舍在于「转换逻辑放哪、谁维护」。</p>
 <p class="avoid">别把 ETL 当纯工具问题。它决定了衍生数据的重建成本：重建要跑多久，直接决定故障恢复的 RTO。</p>
 <p class="see">→ <a href="../lessons/0001-tradeoffs-in-data-systems.html">L1</a></p>
 </dd>
 
-<dt>数据仓库<span class="en">data warehouse</span></dt>
+<dt id="data-warehouse">数据仓库<span class="en">data warehouse</span></dt>
 <dd>
 <p>把多个 OLTP 系统的数据汇总整理后供分析使用的独立数据库。它存在的四条理由：数据孤岛、模式不合适、分析开销会外溢到在线服务、网络隔离。</p>
 <p class="avoid">别说「仓库就是把数据复制一份」。复制一份谁都会，难的是跨源对齐口径与时间语义。</p>
 <p class="see">→ <a href="../lessons/0001-tradeoffs-in-data-systems.html">L1</a></p>
 </dd>
 
-<dt>容错<span class="en">fault-tolerant</span></dt>
+<dt id="fault-tolerant">容错<span class="en">fault-tolerant</span></dt>
 <dd>
 <p>出现故障（机器崩溃、链路中断、磁盘坏块）后系统仍能自动恢复并正确工作。关键区分：<strong>故障（fault）是部件偏离规格，失效（failure）是系统整体停止提供服务</strong>；容错就是阻止前者变成后者。</p>
 <p class="avoid">别说「我们不会出故障」。要说的永远是「我们假设哪几类故障、不假设哪几类」。</p>
 <p class="see">→ <a href="../lessons/0002-nonfunctional-requirements.html">L2 定义非功能性需求</a></p>
 </dd>
 
-<dt>无共享<span class="en">shared-nothing</span></dt>
+<dt id="shared-nothing">无共享<span class="en">shared-nothing</span></dt>
 <dd>
 <p>每个节点有独立 CPU、内存、磁盘，仅通过普通网络协作的架构。相对的是共享内存与共享磁盘。它的好处是横向扩展与故障隔离；代价是所有协调都要走网络，而网络是异步且不可靠的。</p>
 <p class="avoid">别把「无共享」当成「无需协调」。恰恰相反，无共享把所有协调成本显式暴露出来了。</p>
 <p class="see">→ <a href="../lessons/0002-nonfunctional-requirements.html">L2</a></p>
 </dd>
 
-<dt>可伸缩性<span class="en">scalability</span></dt>
+<dt id="scalability">可伸缩性<span class="en">scalability</span></dt>
 <dd>
 <p>负载增长时系统仍有合理办法应对的性质。它是一个<em>关系</em>，不是属性：必须先量化负载（每秒请求数、读写比、数据量、峰值与均值倍数），才谈得上「可扩展」。线性扩展、主动伸缩与被动伸缩是三个不同的说法。</p>
 <p class="avoid">别说「这个系统是可扩展的」。要说「在 X 负载下，加一倍节点能带来百分之几的吞吐」。</p>
 <p class="see">→ <a href="../lessons/0002-nonfunctional-requirements.html">L2</a></p>
 </dd>
 
-<dt>可维护性<span class="en">maintainability</span></dt>
+<dt id="maintainability">可维护性<span class="en">maintainability</span></dt>
 <dd>
 <p>可运维（operability）、简单（simplicity）、可演化（evolvability）三项的合称。书里给它的定位很硬：它是唯一一项你每天都要付利息的维度。</p>
 <p class="avoid">别把可维护性当成「代码风格」。在数据系统里它的具体形态是：加一个字段要动几个服务、换一个存储引擎要重写多少、排一次故障要开几个面板。</p>
@@ -107,90 +107,90 @@
 
 <div class="gloss">
 <dl>
-<dt>关系模型<span class="en">relational model</span></dt>
+<dt id="relational-model">关系模型<span class="en">relational model</span></dt>
 <dd>
 <p>数据表示为无序的行（元组）集合，通过声明的键与连接表达关系。它的优势是连接是一等公民，多对多不需要应用层拼装；代价是模式相对刚性与对象-关系阻抗。</p>
 <p class="avoid">别说「关系模型过时了」。绝大多数 N+1 查询问题的根因是<em>用文档模型存了本该连接的数据</em>，不是关系模型不好。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3 数据模型与查询语言</a></p>
 </dd>
 
-<dt>文档模型<span class="en">document model</span></dt>
+<dt id="document-model">文档模型<span class="en">document model</span></dt>
 <dd>
 <p>数据表示为自包含的文档（通常是 JSON），一棵树存一个实体及其嵌套部分。它擅长一对多（整棵树一次读出、局部性好），不擅长多对多（要应用层 join 或反规范化）。</p>
 <p class="avoid">别说「文档模型不需要模式」。模式只是从写入时移到了读取时（schema-on-read），代价由每个读者承担。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3</a></p>
 </dd>
 
-<dt>图<span class="en">graph</span></dt>
+<dt id="graph">图<span class="en">graph</span></dt>
 <dd>
 <p>由顶点（vertices，也称 nodes/entities）与边（edges，也称 relationships/arcs）组成的数据结构。适合高度互联、连接深度不可预知的数据（社交关系、路网、欺诈链路）。</p>
 <p class="avoid">别因为「有外键」就说自己在用图模型。判据是<em>查询需要在未知深度上遍历</em>。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3</a></p>
 </dd>
 
-<dt>事件溯源<span class="en">event sourcing</span></dt>
+<dt id="event-sourcing">事件溯源<span class="en">event sourcing</span></dt>
 <dd>
 <p>把不可变的事件日志作为权威数据源，当前状态由事件重放派生出来。它把「记录系统」和「衍生数据」的关系显式化了，天然支持审计与时间旅行。</p>
 <p class="avoid">别说「事件溯源 = 存一份变更日志」。变更日志是复制机制，事件溯源是<em>数据模型的选择</em>：事件本身是业务事实，不是数据库内部记录。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3</a> 与 <a href="../lessons/0013-philosophy-of-streaming-systems.html">L13 流式系统的哲学</a></p>
 </dd>
 
-<dt>物化<span class="en">materialize</span></dt>
+<dt id="materialize">物化<span class="en">materialize</span></dt>
 <dd>
 <p>把计算结果提前算好写下来，而不是每次按需即时计算。物化视图、缓存、索引都是物化的不同形态。<strong>物化就是制造衍生数据</strong>。</p>
 <p class="avoid">别以为物化只是性能优化。一旦物化，你就多了一份会与源数据不一致的副本，也就多了一份要监控、要重建的责任。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3</a></p>
 </dd>
 
-<dt>声明式<span class="en">declarative</span></dt>
+<dt id="declarative">声明式<span class="en">declarative</span></dt>
 <dd>
 <p>描述「想要什么性质」，而不是「如何一步步实现」。SQL 是声明式，因为查询优化器可以自由改执行计划；命令式代码把执行顺序写死了，优化空间被作者提前花掉。</p>
 <p class="avoid">别说「声明式一定更快」。声明式给的是<em>优化空间</em>，优化器不行时它反而更慢，这也是为什么还要看执行计划。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3</a></p>
 </dd>
 
-<dt>规范化<span class="en">normalized</span></dt>
+<dt id="normalized">规范化<span class="en">normalized</span></dt>
 <dd>
 <p>数据结构中尽量避免冗余与重复，使一处变化只改一处。代价是读要连接多个表。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3</a></p>
 </dd>
 
-<dt>反规范化<span class="en">denormalize</span></dt>
+<dt id="denormalize">反规范化<span class="en">denormalize</span></dt>
 <dd>
 <p>在已规范化的数据里引入冗余（缓存、索引、冗余列）换取更快的读。反规范化的值本质上是预计算结果，与物化视图同类。</p>
 <p class="avoid">别把反规范化当成「为了性能可以先乱来」。每一处反规范化都要说清：谁负责同步、不一致时以谁为准。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3</a></p>
 </dd>
 
-<dt>连接<span class="en">join</span></dt>
+<dt id="join">连接<span class="en">join</span></dt>
 <dd>
 <p>把有引用关系的记录拼在一起。在关系模型里是数据库的活，在文档/分布式模型里往往变成客户端的活，甚至变成一条跨分片的网络往返。</p>
 <p class="avoid">别说「join 慢所以要反规范化」。先分清是缺索引、跨分片、还是数据布局问题，三者代价差一到两个数量级。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3</a> 与 <a href="../lessons/0007-sharding.html">L7 分片</a></p>
 </dd>
 
-<dt>数据框<span class="en">dataframe</span></dt>
+<dt id="dataframe">数据框<span class="en">dataframe</span></dt>
 <dd>
 <p>第二版新增的模型：把数据看成带列名的二维表，在其上做变换组合（filter / join / groupby / pivot）。它成了数据分析的事实标准，因为抽象层级正好落在「一张表的变换」——比 SQL 更可组合，比手写循环更可利用优化器（如 Apache Spark 的 Catalyst）。</p>
 <p class="avoid">别说「数据框就是内存里的表」。它的价值在于<em>变换是可组合的表达式</em>，而不是某个具体实现。</p>
 <p class="see">→ <a href="../lessons/0003-data-models-and-query-languages.html">L3</a></p>
 </dd>
 
-<dt>模式<span class="en">schema</span></dt>
+<dt id="schema">模式<span class="en">schema</span></dt>
 <dd>
 <p>对数据结构的描述（字段、类型、约束）。检查时机可以在写入时（schema-on-write）或读取时（schema-on-read）；模式也可随时间演进。</p>
 <p class="avoid">别说「无模式」。只有「什么时候检查」的区别，没有「有没有」的区别。</p>
 <p class="see">→ <a href="../lessons/0005-encoding-and-evolution.html">L5 编码与演化</a></p>
 </dd>
 
-<dt>前向兼容<span class="en">forward compatibility</span></dt>
+<dt id="forward-compatibility">前向兼容<span class="en">forward compatibility</span></dt>
 <dd>
 <p>旧代码能读新代码写的数据。它比后向兼容难，因为旧代码无法预料新字段，只能靠「忽略不认识的字段 / 保留未知字段」这类编码设计。</p>
 <p class="avoid">别说「我们前后兼容都做到了」而不说机制。机制只有几类：可选字段 + 默认值、保留字段号、显式版本标记、schema registry。</p>
 <p class="see">→ <a href="../lessons/0005-encoding-and-evolution.html">L5</a></p>
 </dd>
 
-<dt>后向兼容<span class="en">backward compatibility</span></dt>
+<dt id="backward-compatibility">后向兼容<span class="en">backward compatibility</span></dt>
 <dd>
 <p>新代码能读旧代码写的数据。这是最容易做也最容易忘的一条：只删不加、只加可选字段，后向兼容几乎免费。</p>
 <p class="see">→ <a href="../lessons/0005-encoding-and-evolution.html">L5</a></p>
@@ -203,74 +203,74 @@
 
 <div class="gloss">
 <dl>
-<dt>日志结构合并树<span class="en">LSM-tree · log-structured merge tree</span></dt>
+<dt id="lsm-tree">日志结构合并树<span class="en">LSM-tree · log-structured merge tree</span></dt>
 <dd>
 <p>写入只追加、不原地更新：新数据先进内存表（memtable），刷盘成不可变的 SSTable，后台再把多个 SSTable 归并压实。读要按「内存表 → 新 SSTable → 旧 SSTable」逐层查找，所以写入便宜、读取代价高。</p>
 <p class="avoid">别说「LSM 比 B 树快」。它在写密集负载下快，在读放大与空间放大上要还债，尤其范围查询要合并多层。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4 存储与检索</a></p>
 </dd>
 
-<dt>SSTable<span class="en">sorted string table</span></dt>
+<dt id="sorted-string-table">SSTable<span class="en">sorted string table</span></dt>
 <dd>
 <p>按键有序、不可变的磁盘文件，带稀疏索引与块级校验和。不可变是关键：文件一旦写成不再修改，所以并发读不需要加锁，压实只需整文件重写。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
 </dd>
 
-<dt>B 树<span class="en">B-tree</span></dt>
+<dt id="b-tree">B 树<span class="en">B-tree</span></dt>
 <dd>
 <p>把数据按固定大小的页（通常 4KB）组织成平衡树，页内原地更新。它的写放大来自「改一个字节也要写一整页」，且必须配预写日志才能保证崩溃安全，所以一次逻辑写至少变成两笔物理写。</p>
 <p class="avoid">别说「B 树已过时」。它的读放大稳定、范围扫描连续，所以在读多写少与事务型负载里仍是默认选择。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
 </dd>
 
-<dt>写放大<span class="en">write amplification</span></dt>
+<dt id="write-amplification">写放大<span class="en">write amplification</span></dt>
 <dd>
 <p>一次应用层写入导致的物理写入字节数。B 树通常 ≥2（日志 + 页）；LSM 在稳态下由压实倍数决定，层数越多倍数越高（典型 10–30）。它是把「写吞吐」换算成「磁盘带宽」的那个系数，闪存寿命也直接吃这个数。</p>
 <p class="avoid">别只谈 IOPS 不谈写放大。同样的 IOPS 预算，写放大 20 的系统实际能承载的写入只有 5%。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
 </dd>
 
-<dt>压实<span class="en">compaction</span></dt>
+<dt id="compaction">压实<span class="en">compaction</span></dt>
 <dd>
 <p>后台把多个 SSTable 归并重写、丢弃被覆盖或已删除的版本。它带来两个副作用：磁盘带宽被后台任务吃掉（前台 p99 抖动的主因），以及压实跟不上写入时读放大持续恶化。</p>
 <p class="avoid">别说「后台任务不影响前台」。压实与前台写共享同一块盘，限流做不好就是尾延迟灾难。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
 </dd>
 
-<dt>堆文件<span class="en">heap file</span></dt>
+<dt id="heap-file">堆文件<span class="en">heap file</span></dt>
 <dd>
 <p>记录无序存放的数据文件，索引只存指向记录的指针。好处是一条记录只存一份、多个索引可共存；代价是索引命中后还要按指针再读一次（随机 I/O）。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
 </dd>
 
-<dt>聚簇索引<span class="en">clustered index</span></dt>
+<dt id="clustered-index">聚簇索引<span class="en">clustered index</span></dt>
 <dd>
 <p>索引里直接存行数据（或按索引键的物理顺序存行），所以主键查找一次 I/O 到位，代价是一条记录只能有一种物理顺序，二级索引要回表。</p>
 <p class="avoid">别说「聚簇索引一定更快」。它把顺序押在主键上：随机主键（UUID）会让插入点分散到全表，反而制造写热点。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
 </dd>
 
-<dt>二级索引<span class="en">secondary index</span></dt>
+<dt id="secondary-index">二级索引<span class="en">secondary index</span></dt>
 <dd>
 <p>按非主键属性建立的索引。它天然是「一份必须与主数据保持一致的衍生数据」，所以每个二级索引都是一笔要在写入路径上偿付的维护成本。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a> 与 <a href="../lessons/0007-sharding.html">L7 分片</a></p>
 </dd>
 
-<dt>列式存储<span class="en">column-oriented storage</span></dt>
+<dt id="column-oriented-storage">列式存储<span class="en">column-oriented storage</span></dt>
 <dd>
 <p>把同一列的值连续存放，而不是按行。三个收益叠加：只读查询涉及的列（I/O 少一个数量级）、同列同类型压缩率高（位图 / 游程 / 字典）、排序后可用最小最大索引跳过整块。</p>
 <p class="avoid">别说「列存适合大数据」。判据是<em>访问模式是否是「少数列 × 海量行」的聚合</em>；点查与整行读写它反而更差。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
 </dd>
 
-<dt>位图编码<span class="en">bitmap encoding</span></dt>
+<dt id="bitmap-encoding">位图编码<span class="en">bitmap encoding</span></dt>
 <dd>
 <p>对低基数（不同取值很少）的列，为每个取值存一个比特位图，查询时按位与/或直接得到行号集合。它让「性别 = 女 且 城市 = 北京」这类条件变成几次内存位运算。</p>
 <p class="avoid">别对有高基数的列用位图。取值一多，位图数量爆炸，压缩率与查询速度同时崩掉。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
 </dd>
 
-<dt>数据立方<span class="en">data cube · OLAP cube</span></dt>
+<dt id="data-cube">数据立方<span class="en">data cube · OLAP cube</span></dt>
 <dd>
 <p>按多个维度预先聚合好的物化结果，查询时按维度组合取格子。它是「用空间换时间」的极端形态：格子数是各维度基数之积，维度一多就不可维护。</p>
 <p class="avoid">别说「建个 cube 就好了」。先算格子数：10 个维度各 20 个取值就是一万亿个格子。</p>
@@ -284,122 +284,122 @@
 
 <div class="gloss">
 <dl>
-<dt>复制<span class="en">replication</span></dt>
+<dt id="replication">复制<span class="en">replication</span></dt>
 <dd>
 <p>把同一份数据保存在多个节点上。它同时服务四个目的：降低延迟（就近读）、提高可用性（故障切换）、提高读吞吐（分摊查询）、以及地理合规。这四个目的经常互相冲突，所以「为什么要复制」必须先说清是哪一个。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6 复制</a></p>
 </dd>
 
-<dt>领导者<span class="en">leader · master · primary</span></dt>
+<dt id="leader">领导者<span class="en">leader · master · primary</span></dt>
 <dd>
 <p>唯一接受写入的副本，写入先经它排序再传播给其他副本。单主的价值不在于性能，而在于<em>把并发写变成了一个全序</em>——没有这个全序，冲突解决就得在每个副本上重做一遍。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>追随者<span class="en">follower · read replica · secondary</span></dt>
+<dt id="follower">追随者<span class="en">follower · read replica · secondary</span></dt>
 <dd>
 <p>从领导者接收变更日志并应用的副本，通常只服务读。它读到的数据落后领导者多久，就是复制滞后。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>复制滞后<span class="en">replication lag</span></dt>
+<dt id="replication-lag">复制滞后<span class="en">replication lag</span></dt>
 <dd>
 <p>从写入在领导者上提交，到该变更在某个追随者上可见之间的时间差。它不是一个可调参数，而是「网络 + 排队 + 应用日志」的合力，负载高峰会放大一个数量级。</p>
 <p class="avoid">别说「最终一致，所以滞后无所谓」。滞后 3 秒意味着用户刚保存的内容刷新后消失——这是可见的产品缺陷，不是理论问题。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>读己之写<span class="en">read-your-writes consistency</span></dt>
+<dt id="read-your-writes-consistency">读己之写<span class="en">read-your-writes consistency</span></dt>
 <dd>
 <p>用户读到的数据至少包含他自己刚写的内容。实现套路有三种：读自己的东西走主库、记住写入的时间戳并只读追平到该时间戳的副本、或按会话粘住同一副本。</p>
 <p class="avoid">别说「我们做了最终一致所以没问题」。最终一致不保证这个，用户提交后看不到自己的提交是最常见的投诉来源。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>单调读<span class="en">monotonic reads</span></dt>
+<dt id="monotonic-reads">单调读<span class="en">monotonic reads</span></dt>
 <dd>
 <p>用户不会看到时间倒流：一旦读到某个版本，之后不会再读到更旧的版本。它防的是「刷新一下数据退回三秒前」，多副本负载均衡到不同滞后程度的节点时必然出现。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>一致前缀读<span class="en">consistent prefix reads</span></dt>
+<dt id="consistent-prefix-reads">一致前缀读<span class="en">consistent prefix reads</span></dt>
 <dd>
 <p>读到的写入序列符合因果顺序：不会出现「答案先到、问题后到」。分片之后特别容易违反：两个有因果关系的写落在不同分片、各自复制，观察者可能先看到后果。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>多主<span class="en">multi-leader replication</span></dt>
+<dt id="multi-leader-replication">多主<span class="en">multi-leader replication</span></dt>
 <dd>
 <p>多个节点都接受写入、彼此异步传播。它换来了跨地域写入的低延迟与断网期间的可写，代价是<em>写冲突必须在某处解决</em>：最后写入者胜（丢数据）、版本向量（要人工介入）、或 CRDT（限制数据类型）。</p>
 <p class="avoid">别说「多主就等于高可用」。多主把冲突从「不会发生」变成「每天发生，只是你还没看见」。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>无主<span class="en">leaderless replication</span></dt>
+<dt id="leaderless-replication">无主<span class="en">leaderless replication</span></dt>
 <dd>
 <p>客户端直接向多个副本写、向多个副本读，靠法定人数保证读到最新值。它没有故障切换这个动作（也就没有切换失败这个故障模式），代价是把协调责任推给了客户端与应用语义。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a> 与 <a href="../lessons/0010-consistency-and-consensus.html">L10 一致性与共识</a></p>
 </dd>
 
-<dt>法定人数<span class="en">quorum</span></dt>
+<dt id="quorum">法定人数<span class="en">quorum</span></dt>
 <dd>
 <p>读集合与写集合相交的最小规模：<code>w + r &gt; n</code>。这个不等式保证读写至少碰到一个共同副本，从而「读到最近一次写」。但它只保证<em>相交</em>，不保证线性一致——没有额外机制时，仍可能读到旧值。</p>
 <p class="avoid">别说「配了 quorum 就是强一致」。并发写、失败重试、以及「读修复尚未收敛」都会破坏它；法定人数给的是概率性的新鲜度，不是线性一致。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>读修复<span class="en">read repair</span></dt>
+<dt id="read-repair">读修复<span class="en">read repair</span></dt>
 <dd>
 <p>读时发现某个副本落后，顺手把新值写回去。它让「被读到的数据」自动收敛，但冷数据永远得不到修复，所以还需要反熵过程兜底。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>反熵<span class="en">anti-entropy</span></dt>
+<dt id="anti-entropy">反熵<span class="en">anti-entropy</span></dt>
 <dd>
 <p>后台持续比对副本间的差异并同步。它不依赖读流量，所以能修好冷数据，代价是常态下的额外带宽与比对开销。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>提示移交<span class="en">hinted handoff</span></dt>
+<dt id="hinted-handoff">提示移交<span class="en">hinted handoff</span></dt>
 <dd>
 <p>目标副本暂时不可用时，由别的节点代存写入并在恢复后转交。它避免了「一个副本挂掉就拒绝写」，但代存节点的磁盘成了新的故障点。</p>
 <p class="see">→ <a href="../lessons/0006-replication.html">L6</a></p>
 </dd>
 
-<dt>脑裂<span class="en">split brain</span></dt>
+<dt id="split-brain">脑裂<span class="en">split brain</span></dt>
 <dd>
 <p>两个节点都认为自己是领导者、都接受写入，于是数据分叉。防它的不是「检测得更快」，而是<em>法定人数 + 栅栏令牌</em>：少数派一侧必须主动拒绝服务。</p>
 <p class="avoid">别说「我们有健康检查所以不会脑裂」。健康检查判断的是「我看得见对方吗」，不是「对方还活着吗」，网络分区下这个判断必然出错。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>分片<span class="en">sharding · partitioning</span></dt>
+<dt id="sharding">分片<span class="en">sharding · partitioning</span></dt>
 <dd>
 <p>把大数据集拆成多个分区放到不同节点。它与复制的分工要分清：<strong>分片解决「一份数据放不下 / 一个节点扛不住」，复制解决「节点会坏」</strong>；两个维度正交，组合起来才是真实的集群。</p>
 <p class="see">→ <a href="../lessons/0007-sharding.html">L7 分片</a></p>
 </dd>
 
-<dt>再平衡<span class="en">rebalance</span></dt>
+<dt id="rebalance">再平衡<span class="en">rebalance</span></dt>
 <dd>
 <p>把数据从负载高的节点迁到负载低的节点，或在增删节点后重新分配。判据是「迁移过程中服务是否可用、迁移量是否与数据总量成正比」。好的方案只搬该搬的那部分。</p>
 <p class="avoid">别说「加机器就能扩容」。如果方案是 <code>hash(key) % n</code>，加一台机器几乎要搬全部数据。</p>
 <p class="see">→ <a href="../lessons/0007-sharding.html">L7</a></p>
 </dd>
 
-<dt>偏斜<span class="en">skew · hot spot</span></dt>
+<dt id="skew">偏斜<span class="en">skew · hot spot</span></dt>
 <dd>
 <p>分区之间负载严重不均，个别分区成为瓶颈。它有两种来源：键本身分布不均（少数大客户），或访问模式不均（同一个键被疯狂读写）。前者靠选键与拆键，后者只能靠缓存或拆写。</p>
 <p class="avoid">别说「哈希就均匀了」。哈希只保证<em>键的数量</em>均匀，不保证每个键的访问量均匀，热点是后者。</p>
 <p class="see">→ <a href="../lessons/0007-sharding.html">L7</a></p>
 </dd>
 
-<dt>一致性哈希<span class="en">consistent hashing</span></dt>
+<dt id="consistent-hashing">一致性哈希<span class="en">consistent hashing</span></dt>
 <dd>
 <p>把键与节点映射到同一个环上，键归顺时针方向第一个节点。增删节点只影响相邻区段，迁移量与节点数成反比而不是与数据量成正比。</p>
 <p class="see">→ <a href="../lessons/0007-sharding.html">L7</a></p>
 </dd>
 
-<dt>按词条分区<span class="en">term-partitioned index · global index</span></dt>
+<dt id="term-partitioned-index">按词条分区<span class="en">term-partitioned index · global index</span></dt>
 <dd>
 <p>二级索引按被索引的词条本身分区，而不是跟着文档走。这样按词条查询只打一个分区，但一次写入要更新分布在各处的多个索引分区，写变成分布式事务级的问题。</p>
 <p class="avoid">别说「索引跟着数据走就行」。那是按文档分区（local index），读时要 scatter/gather 所有分区，尾延迟由最慢的那个决定。</p>
@@ -413,87 +413,87 @@
 
 <div class="gloss">
 <dl>
-<dt>事务<span class="en">transaction</span></dt>
+<dt id="transaction">事务<span class="en">transaction</span></dt>
 <dd>
 <p>把多个读写打包成一个逻辑单元，要么全部生效、要么全部不生效。它的价值是<strong>把「部分失败」这种最难处理的状态从应用代码里删掉</strong>——这是工程收益，不是理论洁癖。</p>
 <p class="avoid">别说「事务影响性能所以能不用就不用」。多数情况下真正影响性能的是长事务持有锁，而不是事务这个抽象本身。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8 事务</a></p>
 </dd>
 
-<dt>原子性<span class="en">atomicity</span></dt>
+<dt id="atomicity">原子性<span class="en">atomicity</span></dt>
 <dd>
 <p>事务内的一组写入要么全部提交、要么全部回滚，不存在中间态。注意它<em>不</em>等于并发隔离：原子性管的是「中途崩溃」，不是「两个事务互相看见半成品」。</p>
 <p class="avoid">别把原子性和隔离性混为一谈。前者是失败语义，后者是并发语义；ACID 里这两个字母经常被一起误用。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>隔离性<span class="en">isolation</span></dt>
+<dt id="isolation">隔离性<span class="en">isolation</span></dt>
 <dd>
 <p>并发事务之间互不干扰的程度。实践中它是一组可选的级别，每个级别对应「允许哪种异常发生」。</p>
 <p class="avoid">别说「我们是 ACID」。ACID 的 I 在实践中几乎从不取最强值，说清级别与代价才算说了。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>持久性<span class="en">durability</span></dt>
+<dt id="durability">持久性<span class="en">durability</span></dt>
 <dd>
 <p>事务提交后，即使断电或崩溃数据也不丢。实现方式从「写入即 fsync」到「先写日志、异步刷盘」不等；后者在崩溃时可能丢最后几百毫秒，这是要写进承诺的取舍。</p>
 <p class="avoid">别说「写进数据库就安全了」。要知道它承诺的是「进程崩溃不丢」还是「磁盘损坏也不丢」，后者需要副本或校验。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a> 与 <a href="../lessons/0009-trouble-with-distributed-systems.html">L9 分布式系统的麻烦</a></p>
 </dd>
 
-<dt>读已提交<span class="en">read committed</span></dt>
+<dt id="read-committed">读已提交<span class="en">read committed</span></dt>
 <dd>
 <p>只允许读到已提交的值，禁止脏读与脏写。这是多数数据库的默认级别。它的漏洞是会「同一事务内两次读到不同值」（不可重复读）与「读到别人刚提交的新行」（幻读）。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>快照隔离<span class="en">snapshot isolation</span></dt>
+<dt id="snapshot-isolation">快照隔离<span class="en">snapshot isolation</span></dt>
 <dd>
 <p>每个事务读到自己开始时刻的一致快照，写冲突在提交时检测。它消除了不可重复读与幻读，代价是<strong>写偏斜仍然可能发生</strong>：两个事务读同一段、写不同行，谁也检测不到冲突。</p>
 <p class="avoid">别说「用了快照隔离就没有并发问题了」。写偏斜是这一级别最著名的漏洞，也是面试里最常被追问的一点。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>写偏斜<span class="en">write skew</span></dt>
+<dt id="write-skew">写偏斜<span class="en">write skew</span></dt>
 <dd>
 <p>两个并发事务各自读取一组行、基于读到的值写入另一组行，两次写的行不重叠，因此行级写冲突检测看不到冲突，但组合结果违反了一条业务不变式（例如「至少一名医生值班」）。</p>
 <p class="avoid">别说「加唯一索引/加行锁就能防」。它防的是<em>写同一行</em>的冲突；写偏斜的本质是「读集合与写集合交叉」，只有可串行化或显式加锁（SELECT FOR UPDATE）能挡。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>可串行化<span class="en">serializable</span></dt>
+<dt id="serializable">可串行化<span class="en">serializable</span></dt>
 <dd>
 <p>最强隔离级别：并发执行的结果等价于按某个串行顺序执行。三种实现各有代价：两阶段锁（排队与死锁）、可串行化快照隔离 SSI（误判与重试）、单线程串行执行（吞吐天花板）。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>两阶段锁<span class="en">two-phase locking · 2PL</span></dt>
+<dt id="two-phase-locking">两阶段锁<span class="en">two-phase locking · 2PL</span></dt>
 <dd>
 <p>读加共享锁、写加排他锁，持锁到事务结束。它确实能给出可串行化，代价是写者互相等待、死锁要靠检测与回滚来处理，尾延迟极不稳定。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>可串行化快照隔离<span class="en">serializable snapshot isolation · SSI</span></dt>
+<dt id="serializable-snapshot-isolation">可串行化快照隔离<span class="en">serializable snapshot isolation · SSI</span></dt>
 <dd>
 <p>乐观并发控制：事务在快照上自由执行，提交时检查「读过的数据是否已被别人改过」，冲突则回滚重试。它把等待换成了重试，所以在高冲突负载下会出现重试风暴，吞吐骤降。</p>
 <p class="avoid">别说「乐观锁一定比悲观锁快」。低冲突时它确实快；热点行高并发时，重试放大的代价会超过锁等待。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>MVCC<span class="en">multi-version concurrency control</span></dt>
+<dt id="multi-version-concurrency-control">MVCC<span class="en">multi-version concurrency control</span></dt>
 <dd>
 <p>保留数据的多个版本，让读操作不需要阻塞写。它让「一致性快照」变得廉价，代价是旧版本必须有人回收（vacuum / GC），否则存储与扫描成本持续膨胀。</p>
 <p class="avoid">别忽略清理。长事务或长时间未提交的快照会让旧版本堆积，这是很多线上「磁盘突然涨满」的真因。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>幻读<span class="en">phantom read</span></dt>
+<dt id="phantom-read">幻读<span class="en">phantom read</span></dt>
 <dd>
 <p>同一事务内两次执行同一范围查询，结果集因为别人插入或删除而行数变化。它防不住是因为「要锁的对象还不存在」，只能靠范围锁或快照。</p>
 <p class="see">→ <a href="../lessons/0008-transactions.html">L8</a></p>
 </dd>
 
-<dt>丢失更新<span class="en">lost update</span></dt>
+<dt id="lost-update">丢失更新<span class="en">lost update</span></dt>
 <dd>
 <p>两个事务各自读到同一个旧值、各自算新值再写回，后写的那次覆盖了前一次的更新。典型修法：原子自增（<code>UPDATE … SET x = x + 1</code>）、显式加锁、或比较并交换（带版本号的条件更新）。</p>
 <p class="avoid">别说「读出来改完再写回」是安全写法。这是丢失更新的教科书形态，任何并发计数场景都会踩到。</p>
@@ -507,59 +507,59 @@
 
 <div class="gloss">
 <dl>
-<dt>故障<span class="en">fault</span></dt>
+<dt id="fault">故障<span class="en">fault</span></dt>
 <dd>
 <p>系统中的一个部件偏离其规格。它与失效（failure，系统整体停止提供服务）是两个层次：容错的设计目标是不让前者升级为后者。</p>
 <p class="avoid">别说「节点挂了」就完事。要说的是「它挂的方式是崩溃、是停止响应、还是变慢到超时」。三者的处理完全不同。</p>
 <p class="see">→ <a href="../lessons/0009-trouble-with-distributed-systems.html">L9 分布式系统的麻烦</a></p>
 </dd>
 
-<dt>部分失效<span class="en">partial failure</span></dt>
+<dt id="partial-failure">部分失效<span class="en">partial failure</span></dt>
 <dd>
 <p>分布式系统特有：一部分部件坏了，另一部分还在正常工作，而你<strong>无法从单点观测区分「对端坏了」与「网络慢到看不见」</strong>。这是全部分布式复杂度的源头。</p>
 <p class="see">→ <a href="../lessons/0009-trouble-with-distributed-systems.html">L9</a></p>
 </dd>
 
-<dt>不可靠网络<span class="en">unreliable network</span></dt>
+<dt id="unreliable-network">不可靠网络<span class="en">unreliable network</span></dt>
 <dd>
 <p>请求可能丢失、响应可能丢失、也可能只是延迟到超时之后才到。所以「没收到响应」永远不能推出「操作没发生」——这是所有重试与幂等设计的出发点。</p>
 <p class="avoid">别说「超时就当失败」。超时是<em>未知</em>，不是失败；把它当失败会导致重复执行副作用。</p>
 <p class="see">→ <a href="../lessons/0009-trouble-with-distributed-systems.html">L9</a></p>
 </dd>
 
-<dt>超时<span class="en">timeout</span></dt>
+<dt id="timeout">超时<span class="en">timeout</span></dt>
 <dd>
 <p>等待响应的上限。它是分布式系统里唯一的故障检测手段，也是所有「假死/重复执行/脑裂」的来源——没有它系统会永远等下去，有它就必然误判。</p>
 <p class="avoid">别说「把超时调大点就好了」。调大只是把误判换成更长的用户等待，并让故障恢复更慢。</p>
 <p class="see">→ <a href="../lessons/0009-trouble-with-distributed-systems.html">L9</a></p>
 </dd>
 
-<dt>无界延迟<span class="en">unbounded delay</span></dt>
+<dt id="unbounded-delay">无界延迟<span class="en">unbounded delay</span></dt>
 <dd>
 <p>网络延迟没有上界，只有分布。因此任何「超过 X 毫秒就算死」的判断在理论上都可能出错，工程上只能按概率与代价来选 X。</p>
 <p class="see">→ <a href="../lessons/0009-trouble-with-distributed-systems.html">L9</a></p>
 </dd>
 
-<dt>时钟偏移<span class="en">clock skew</span></dt>
+<dt id="clock-skew">时钟偏移<span class="en">clock skew</span></dt>
 <dd>
 <p>不同机器上的时钟走得不一样快，即使都用 NTP 同步也会有毫秒级偏差、还能被闰秒或虚拟机暂停放大。结论：<strong>不能用时间戳判断事件先后</strong>，要用逻辑时钟或版本号。</p>
 <p class="avoid">别说「用 created_at 排序就是顺序」。跨节点的时间戳排序会给出错误的因果顺序，且错得没有声响。</p>
 <p class="see">→ <a href="../lessons/0009-trouble-with-distributed-systems.html">L9</a></p>
 </dd>
 
-<dt>单调时钟<span class="en">monotonic clock</span></dt>
+<dt id="monotonic-clock">单调时钟<span class="en">monotonic clock</span></dt>
 <dd>
 <p>只保证单调递增、不保证与真实时间对齐的计时器。测量耗时用它；表示「哪一刻」用墙上时钟。两者混用是分布式系统里的经典错误。</p>
 <p class="see">→ <a href="../lessons/0009-trouble-with-distributed-systems.html">L9</a></p>
 </dd>
 
-<dt>真伪不确定<span class="en">unreliable failure detector</span></dt>
+<dt id="unreliable-failure-detector">真伪不确定<span class="en">unreliable failure detector</span></dt>
 <dd>
 <p>由于超时的存在，任何故障检测器都会犯两类错：误判存活节点为死（导致无谓切换），或迟迟发现不了真死（导致长时间不可用）。设计时只能选偏向哪一侧。</p>
 <p class="see">→ <a href="../lessons/0009-trouble-with-distributed-systems.html">L9</a></p>
 </dd>
 
-<dt>拜占庭故障<span class="en">Byzantine fault</span></dt>
+<dt id="byzantine-fault">拜占庭故障<span class="en">Byzantine fault</span></dt>
 <dd>
 <p>节点不仅会停摆，还会<em>说谎</em>，发出错误或伪造的消息。容忍它需要额外的签名与多数派机制，成本高得多，所以在受控的数据中心里通常不假设它，只在开放网络（区块链、航空电子）里假设。</p>
 <p class="avoid">别说「我们的系统要考虑拜占庭」。先问：你的节点是不是你自己部署、你自己运维的？如果是，故障模型通常是崩溃-恢复，不是拜占庭。</p>
@@ -573,78 +573,78 @@
 
 <div class="gloss">
 <dl>
-<dt>线性一致<span class="en">linearizability · linearizable consistency</span></dt>
+<dt id="linearizability">线性一致<span class="en">linearizability · linearizable consistency</span></dt>
 <dd>
 <p>整个系统看起来像只有一份数据，所有操作按某个全局顺序原子生效，且读到的值一定不早于最近一次已完成的写。它是<strong>单一对象的实时性</strong>保证。注意不要与可串行化混淆，后者是<em>多对象事务</em>的顺序保证。</p>
 <p class="avoid">别说「线性一致 = 强一致 = 可串行化」。线性一致管单对象的实时顺序，可串行化管多事务的等价串行，两者正交、可同时成立也可各自成立。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10 一致性与共识</a></p>
 </dd>
 
-<dt>因果一致<span class="en">causal consistency</span></dt>
+<dt id="causal-consistency">因果一致<span class="en">causal consistency</span></dt>
 <dd>
 <p>只保证有因果关系的操作顺序，无因果关系的并发写可以任意排序。它比线性一致弱，但它有一个重要性质：<strong>是客户端不需要协调就能得到的、最弱但不会让人觉得诡异的保证</strong>。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>最终一致<span class="en">eventual consistency</span></dt>
+<dt id="eventual-consistency">最终一致<span class="en">eventual consistency</span></dt>
 <dd>
 <p>停止写入后，各副本最终会收敛到同一值。「最终」没有时间上界，所以这个说法本身几乎不构成可用承诺。写进文档时必须补上「收敛窗口多久、读到旧值的影响是什么」。</p>
 <p class="avoid">别说「我们最终一致所以没问题」。这是对不确定性的修辞掩盖：缺的是收敛时间的数量级。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>全序<span class="en">total order</span></dt>
+<dt id="total-order">全序<span class="en">total order</span></dt>
 <dd>
 <p>任意两个事件都能比较先后。单主复制之所以简单，就是因为它把并发写放进了同一个全序里；无主与多主则只有偏序，冲突因此无处可藏。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>偏序<span class="en">partial order</span></dt>
+<dt id="partial-order">偏序<span class="en">partial order</span></dt>
 <dd>
 <p>只有部分事件可比（通常靠因果关系）。分布式系统的默认状态是偏序，要得到全序必须付协调代价，这就是共识算法存在的理由。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>因果<span class="en">causality · happens-before</span></dt>
+<dt id="causality">因果<span class="en">causality · happens-before</span></dt>
 <dd>
 <p>若事件 A 的信息可能影响事件 B，则 A 因果先于 B。判断因果不需要真实时间，只需要消息传递的链。这是朗波特时钟与版本向量的基础。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>版本向量<span class="en">version vector</span></dt>
+<dt id="version-vector">版本向量<span class="en">version vector</span></dt>
 <dd>
 <p>每个副本维护一个「见过的版本号」向量，比较两个向量就能判断是「A 包含 B」「B 包含 A」还是「并发」。它精确，但大小随副本数增长，所以通常只用于少量副本或按需压缩。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>共识<span class="en">consensus</span></dt>
+<dt id="consensus">共识<span class="en">consensus</span></dt>
 <dd>
 <p>让多个节点对某个值达成一致，且一旦达成不可反悔。它等价于「全序广播」与「原子提交」，是分布式系统里最强的协调原语，代价是每次决策至少一轮网络往返。</p>
 <p class="avoid">别说「用 Raft 就高可用了」。共识解决的是<em>一致性</em>，吞吐由往返延迟与批次决定；跨地域部署时它反而会放大写延迟。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>全序广播<span class="en">total order broadcast</span></dt>
+<dt id="total-order-broadcast">全序广播<span class="en">total order broadcast</span></dt>
 <dd>
 <p>所有节点以相同顺序收到相同消息。它与共识等价（可以互相实现），也是把「复制日志」变成「状态机复制」的那座桥。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>两阶段提交<span class="en">two-phase commit · 2PC</span></dt>
+<dt id="two-phase-commit">两阶段提交<span class="en">two-phase commit · 2PC</span></dt>
 <dd>
 <p>协调者先让所有参与者准备（投票），再统一提交或回滚。它保证原子性，但在协调者崩溃时会留下「参与者卡在已准备、既不能提交也不能回滚」的状态。这是它最著名的失败模式。</p>
 <p class="avoid">别说「2PC 保证一致性」。它保证的是原子提交，代价是可用性：协调者成了单点，且参与者在不确定期间必须一直持锁。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>栅栏令牌<span class="en">fencing token</span></dt>
+<dt id="fencing-token">栅栏令牌<span class="en">fencing token</span></dt>
 <dd>
 <p>每次获得锁时拿到一个单调递增的编号，下游资源拒绝编号更小的写入。它解决的是「持锁者以为自己还持锁，其实已被判定失效」。只有令牌能让被保护资源自己识别过期的持有者。</p>
 <p class="avoid">别说「加了分布式锁就安全了」。没有栅栏令牌的锁在 GC 停顿或网络抖动后仍然会双写。</p>
 <p class="see">→ <a href="../lessons/0010-consistency-and-consensus.html">L10</a></p>
 </dd>
 
-<dt>CAP 定理<span class="en">CAP theorem</span></dt>
+<dt id="cap-theorem">CAP 定理<span class="en">CAP theorem</span></dt>
 <dd>
 <p>网络分区发生时，一致性与可用性只能选一个。它对设计的真实意义不是「三选二」，而是<strong>「分区一定会发生，所以先决定分区期间拒服务还是给旧数据」</strong>。</p>
 <p class="avoid">别说「我们选了 AP 所以可用」。要说清：分区期间写会被接受但可能冲突、读可能读到旧值，以及冲突之后怎么收敛。</p>
@@ -658,95 +658,95 @@
 
 <div class="gloss">
 <dl>
-<dt>批处理<span class="en">batch processing</span></dt>
+<dt id="batch-processing">批处理<span class="en">batch processing</span></dt>
 <dd>
 <p>读取一批有界输入、跑完产出结果、然后退出。它的核心优势是<strong>可以重跑</strong>：同样的输入必然得到同样的输出，所以衍生数据可以由记录系统重建。</p>
 <p class="avoid">别说「批处理就是慢」。慢的原因是全量扫描与落盘，换来的是可重跑与可审计，这是它比流处理更适合做「权威衍生数据」的理由。</p>
 <p class="see">→ <a href="../lessons/0011-batch-processing.html">L11 批处理</a></p>
 </dd>
 
-<dt>流处理<span class="en">stream processing</span></dt>
+<dt id="stream-processing">流处理<span class="en">stream processing</span></dt>
 <dd>
 <p>对无界输入持续处理并输出。它把「什么时候算完」这个问题暴露出来：没有终点，所以只能用窗口、水位线这类约定来判断「这一刻的数据够了吗」。</p>
 <p class="see">→ <a href="../lessons/0012-stream-processing.html">L12 流处理</a></p>
 </dd>
 
-<dt>有界<span class="en">bounded</span></dt>
+<dt id="bounded">有界<span class="en">bounded</span></dt>
 <dd>
 <p>输入有明确终点（一个文件、一天的日志）。有界数据才能定义「处理完成」。</p>
 <p class="see">→ <a href="../lessons/0011-batch-processing.html">L11</a></p>
 </dd>
 
-<dt>无界<span class="en">unbounded</span></dt>
+<dt id="unbounded">无界<span class="en">unbounded</span></dt>
 <dd>
 <p>输入持续到达、永不结束。所有「完成后」的语义在无界数据上都必须重新定义为「某个窗口内」。</p>
 <p class="see">→ <a href="../lessons/0012-stream-processing.html">L12</a></p>
 </dd>
 
-<dt>水位线<span class="en">watermark</span></dt>
+<dt id="watermark">水位线<span class="en">watermark</span></dt>
 <dd>
 <p>对「事件时间小于 T 的数据应该都到齐了」的声明。它是流处理里唯一能触发窗口计算的机制，本质是<strong>用迟到数据换及时性的一个旋钮</strong>：水位线放得保守，结果准但慢；放得激进，快但会漏。</p>
 <p class="avoid">别说「流处理是实时的所以没有延迟问题」。窗口结果的正确性完全取决于水位线策略，而这必须先问「业务能容忍多晚的数据被丢弃」。</p>
 <p class="see">→ <a href="../lessons/0012-stream-processing.html">L12</a> 与 <a href="../lessons/0013-philosophy-of-streaming-systems.html">L13 流式系统的哲学</a></p>
 </dd>
 
-<dt>事件时间<span class="en">event time</span></dt>
+<dt id="event-time">事件时间<span class="en">event time</span></dt>
 <dd>
 <p>事件实际发生的时间，由产生它的设备记录。它与处理时间（处理节点看到它的时间）可能相差任意长：离线补传、客户端时钟错、队列积压都会拉开两者。</p>
 <p class="see">→ <a href="../lessons/0012-stream-processing.html">L12</a></p>
 </dd>
 
-<dt>处理时间<span class="en">processing time</span></dt>
+<dt id="processing-time">处理时间<span class="en">processing time</span></dt>
 <dd>
 <p>处理节点接收事件时的本地时钟。用它做窗口简单、不会等迟到数据，但重跑同一批数据会得到不同结果，这就破坏了可重跑性。</p>
 <p class="see">→ <a href="../lessons/0012-stream-processing.html">L12</a></p>
 </dd>
 
-<dt>幂等<span class="en">idempotent</span></dt>
+<dt id="idempotent">幂等<span class="en">idempotent</span></dt>
 <dd>
 <p>执行一次与执行多次的效果相同。它是「至少一次」投递能变成「恰好一次」效果的唯一实用手段：不消除重复，而是让重复无害。</p>
 <p class="avoid">别说「我们用了恰好一次」。多数系统给的是「至少一次投递 + 幂等写」，说清这一点比宣称恰好一次可信得多。</p>
 <p class="see">→ <a href="../lessons/0012-stream-processing.html">L12</a></p>
 </dd>
 
-<dt>恰好一次<span class="en">exactly-once</span></dt>
+<dt id="exactly-once">恰好一次<span class="en">exactly-once</span></dt>
 <dd>
 <p>端到端语义：效果上每个事件只被处理一次。实现方式是「去重（幂等写）+ 原子提交偏移量与输出」，缺一不可；跨系统的输出通常拿不到这个保证。</p>
 <p class="see">→ <a href="../lessons/0012-stream-processing.html">L12</a></p>
 </dd>
 
-<dt>反压<span class="en">backpressure</span></dt>
+<dt id="backpressure">反压<span class="en">backpressure</span></dt>
 <dd>
 <p>下游处理不过来时向上游施加压力（阻塞、限流、丢包）。没有反压的系统在过载时不会变慢，而是会<strong>崩掉或无限堆积</strong>——这是最常见的容量事故形态。</p>
 <p class="see">→ <a href="../lessons/0012-stream-processing.html">L12</a></p>
 </dd>
 
-<dt>流式连接<span class="en">stream join</span></dt>
+<dt id="stream-join">流式连接<span class="en">stream join</span></dt>
 <dd>
 <p>把两条无界流按某个键或时间窗口拼在一起。难点全在「另一边还没到怎么办」：要么缓存一侧（状态无限增长），要么用窗口界定（结果不完备）。</p>
 <p class="see">→ <a href="../lessons/0012-stream-processing.html">L12</a></p>
 </dd>
 
-<dt>端到端原则<span class="en">end-to-end argument</span></dt>
+<dt id="end-to-end-argument">端到端原则<span class="en">end-to-end argument</span></dt>
 <dd>
 <p>一个功能只有在通信两端实现才算真正可靠；网络中间层的检查只能作为优化，不能作为保证。它对数据系统的直接推论：<strong>去重、校验、确认必须在最终消费者那里完成</strong>，消息队列的「可靠投递」承诺到不了应用语义。</p>
 <p class="see">→ <a href="../lessons/0013-philosophy-of-streaming-systems.html">L13 流式系统的哲学</a></p>
 </dd>
 
-<dt>及时性<span class="en">timeliness</span></dt>
+<dt id="timeliness">及时性<span class="en">timeliness</span></dt>
 <dd>
 <p>用户观察到的状态有多接近真实状态。违反及时性意味着「数据是旧的」，这是可接受的，只要说清旧多久。</p>
 <p class="see">→ <a href="../lessons/0013-philosophy-of-streaming-systems.html">L13</a></p>
 </dd>
 
-<dt>完整性<span class="en">integrity</span></dt>
+<dt id="integrity">完整性<span class="en">integrity</span></dt>
 <dd>
 <p>数据没有丢失或损坏。违反完整性意味着「数据永远不对了」，这不可接受，且不能用「最终一致」来辩护。</p>
 <p class="avoid">这是全书最该背下来的一句区分：<strong>违反及时性叫最终一致，违反完整性叫永远不一致</strong>。把两者混为一谈是评审里最贵的错误。</p>
 <p class="see">→ <a href="../lessons/0013-philosophy-of-streaming-systems.html">L13</a></p>
 </dd>
 
-<dt>数据流图<span class="en">dataflow</span></dt>
+<dt id="dataflow">数据流图<span class="en">dataflow</span></dt>
 <dd>
 <p>把系统看成「数据集 → 变换 → 数据集」的有向图，而不是「服务调用服务」。这种视角下，「这个报表的数字从哪来」可以逐跳回溯到记录系统，也是判断衍生数据能否重建的唯一办法。</p>
 <p class="see">→ <a href="../lessons/0013-philosophy-of-streaming-systems.html">L13</a></p>
@@ -759,26 +759,26 @@
 
 <div class="gloss">
 <dl>
-<dt>预测分析<span class="en">predictive analytics</span></dt>
+<dt id="predictive-analytics">预测分析<span class="en">predictive analytics</span></dt>
 <dd>
 <p>用历史数据训练模型去推断个体属性或行为。它的伦理风险不在于算法本身，而在于<strong>它把过去的偏见固化成对未来的判决</strong>，并且当事人无从申辩。</p>
 <p class="see">→ <a href="../lessons/0014-doing-the-right-thing.html">L14 做正确的事情</a></p>
 </dd>
 
-<dt>数据最小化<span class="en">data minimization</span></dt>
+<dt id="data-minimization">数据最小化<span class="en">data minimization</span></dt>
 <dd>
 <p>只收集当下有明确用途的数据。它是应对「以后可能有用」这种采集冲动的最有效原则：不收集的数据不会泄露、不会被滥用、也不会成为合规负债。</p>
 <p class="avoid">别说「先收集着，以后可能用得上」。这是数据系统里代价最高的一句话，因为它把风险敞口永久化了。</p>
 <p class="see">→ <a href="../lessons/0014-doing-the-right-thing.html">L14</a></p>
 </dd>
 
-<dt>被遗忘权<span class="en">right to be forgotten</span></dt>
+<dt id="right-to-be-forgotten">被遗忘权<span class="en">right to be forgotten</span></dt>
 <dd>
 <p>用户要求删除个人数据时，删除必须传播到所有衍生数据（备份、索引、物化视图、日志、训练集）。这直接暴露了你对衍生数据的治理能力：删不掉，说明你不知道数据流到哪去了。</p>
 <p class="see">→ <a href="../lessons/0014-doing-the-right-thing.html">L14</a></p>
 </dd>
 
-<dt>隐私<span class="en">privacy</span></dt>
+<dt id="privacy">隐私<span class="en">privacy</span></dt>
 <dd>
 <p>对「谁能观察、推断、影响一个人」的控制权。在数据系统里它不是「加密就行」，而是「谁能查、能查多久、能关联到什么粒度」。</p>
 <p class="see">→ <a href="../lessons/0014-doing-the-right-thing.html">L14</a></p>

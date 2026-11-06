@@ -132,3 +132,4 @@
 3. 没有 `<style>`、没有外链 CDN。
 4. 每课至少 2 个 `.excerpt`、至少 1 个 `.anti`、至少 1 个交互组件（quiz / recall / triage）。
 5. `grep -o 'class="excerpt"' 文件 | wc -l` 数量达标；正文汉字数 ≥ 2500（`python3 -c` 数中文字符）。
+6. 新术语首现处要链到 `../reference/glossary.html#SLUG`（`<a class="gref">`）。改完 `python3 tools/link_terms.py` 补链；**该脚本不幂等**，重跑前先 `git checkout lessons/`。

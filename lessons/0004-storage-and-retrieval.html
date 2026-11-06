@@ -12,7 +12,7 @@
 <p class="crumb"><a href="../reference/glossary.html">术语表</a> · 第 4 章 · 课程 4 / 14</p>
 
 <h1>存储与检索</h1>
-<p class="standfirst">这一章不是「数据库内部原理科普」，而是一道选择题：同样的写入量，你打算让磁盘多写几倍、让读多找几处、让后台多干多少活。B 树和 LSM 树的全部差别，最后都落在「你把写放大换成了什么」这一句话上。</p>
+<p class="standfirst">这一章不是「数据库内部原理科普」，而是一道选择题：同样的写入量，你打算让磁盘多写几倍、让读多找几处、让后台多干多少活。<a class="gref" href="../reference/glossary.html#b-tree">B 树</a>和 LSM 树的全部差别，最后都落在「你把<a class="gref" href="../reference/glossary.html#write-amplification">写放大</a>换成了什么」这一句话上。</p>
 
 <blockquote>
 <p>计算机科学里的每个问题都可以用一层间接解决，除了「间接层太多」这个问题。</p>
@@ -34,7 +34,7 @@
 
 <h2><span class="num">4.2</span>LSM 树：只追加，把随机写换成后台合并</h2>
 
-<p>日志结构（log-structured）这一派的核心动作只有两个：<strong>追加</strong>和<strong>合并</strong>。数据先写内存表（memtable，通常是一棵有序结构，比如跳表或红黑树），写满后整体刷成一个不可变的段文件；后台再把多个段合并、丢掉被覆盖的旧值。按键排序的段文件就是 SSTable（Sorted String Table）。</p>
+<p>日志结构（log-structured）这一派的核心动作只有两个：<strong>追加</strong>和<strong>合并</strong>。数据先写内存表（memtable，通常是一棵有序结构，比如跳表或红黑树），写满后整体刷成一个不可变的段文件；后台再把多个段合并、丢掉被覆盖的旧值。按键排序的段文件就是 <a class="gref" href="../reference/glossary.html#sorted-string-table">SSTable</a>（Sorted String Table）。</p>
 
 <figure class="fig">
 <img src="../assets/fig/ddia_0402.png" alt="带有稀疏索引的 SSTable，查询可以直接跳到正确的数据块">
@@ -56,7 +56,7 @@
 
 <p>第三个好处是范围扫描：因为有序，扫一段键就是在段文件里连续读。但这里有个容易忽略的代价：<strong>LSM 的范围查询要并行扫描所有段再归并</strong>，而布隆过滤器（Bloom filter）对范围查询无能为力，因为算不出「范围内每个可能键」的哈希。所以 LSM 的点查靠布隆过滤器挡掉大部分无效段；范围查则要真的碰所有层。</p>
 
-<p>还有一处工程细节，做底层的人会立刻敏感：<strong>写入放大不是均匀发生的——它会在压实（compaction）时集中爆发</strong>。memtable 写满时如果压实追不上，RocksDB 一类引擎会施加背压（backpressure），暂停读写直到刷盘完成。在你的监控上，这就是一次 p99 尖峰，而不是平均吞吐下降。压实策略因此不是调优细节，而是容量规划的一部分：</p>
+<p>还有一处工程细节，做底层的人会立刻敏感：<strong>写入放大不是均匀发生的——它会在<a class="gref" href="../reference/glossary.html#compaction">压实</a>（compaction）时集中爆发</strong>。memtable 写满时如果压实追不上，RocksDB 一类引擎会施加背压（backpressure），暂停读写直到刷盘完成。在你的监控上，这就是一次 p99 尖峰，而不是平均吞吐下降。压实策略因此不是调优细节，而是容量规划的一部分：</p>
 
 <p class="lead-in">表 4-A　两种常见压实策略，选错的表现是「读延迟随数据量增长而恶化」</p>
 <table>
@@ -125,7 +125,7 @@
 <div class="pair">
 <div>
 <b>这样设计</b>
-<p>用 MySQL InnoDB 存设备时序事件：单表，主键是随机 UUID，每秒 5 万插入，保留 90 天，每天凌晨用 <code>DELETE FROM events WHERE ts &lt; NOW() - INTERVAL 90 DAY</code> 清理。另外在 <code>device_id</code> 和 <code>ts</code> 上各建一个二级索引。</p>
+<p>用 MySQL InnoDB 存设备时序事件：单表，主键是随机 UUID，每秒 5 万插入，保留 90 天，每天凌晨用 <code>DELETE FROM events WHERE ts &lt; NOW() - INTERVAL 90 DAY</code> 清理。另外在 <code>device_id</code> 和 <code>ts</code> 上各建一个<a class="gref" href="../reference/glossary.html#secondary-index">二级索引</a>。</p>
 </div>
 <div>
 <b>为什么崩</b>
@@ -141,7 +141,7 @@
 
 <p>前面所有讨论都默认「一次读一行或几行」，这是 OLTP。分析查询的形状完全相反：<strong>扫大量行，但只用少数几列</strong>。书中给的数字很具体：事实表通常有一百多列，而典型分析查询只访问其中四五列；示例查询要扫 2024 年所有水果和糖果的销售记录，却只需要 <code>date_key</code>、<code>product_sk</code>、<code>quantity</code> 三列。</p>
 
-<p>行式存储（row-oriented）在这里的浪费是结构性的：为了拿到三列，它必须把整行一百多列从磁盘搬到内存、逐个解析、再丢掉。列式存储做的事很简单：<strong>把同一列的值放在一起</strong>。于是「只读三列」变成了字面意义上的「只读三列的数据」——而不是「读了一百列再扔掉九十七列」。</p>
+<p>行式存储（row-oriented）在这里的浪费是结构性的：为了拿到三列，它必须把整行一百多列从磁盘搬到内存、逐个解析、再丢掉。<a class="gref" href="../reference/glossary.html#column-oriented-storage">列式存储</a>做的事很简单：<strong>把同一列的值放在一起</strong>。于是「只读三列」变成了字面意义上的「只读三列的数据」——而不是「读了一百列再扔掉九十七列」。</p>
 
 <figure class="fig">
 <img src="../assets/fig/ddia_0407.png" alt="按列而不是按行存储关系数据">
@@ -153,7 +153,7 @@
 <div class="grid2">
 <div class="card">
 <h4>一、列内数据高度重复，压缩率极高</h4>
-<p>同一列的值域往往很小（十万种产品对上十亿笔交易），适合位图编码：每个不同值一张位图，行号即位的位置，稀疏部分再用游程编码（Roaring bitmap 在两种表示间自动切换）。一列十亿行常能压到几 MB。</p>
+<p>同一列的值域往往很小（十万种产品对上十亿笔交易），适合<a class="gref" href="../reference/glossary.html#bitmap-encoding">位图编码</a>：每个不同值一张位图，行号即位的位置，稀疏部分再用游程编码（Roaring bitmap 在两种表示间自动切换）。一列十亿行常能压到几 MB。</p>
 </div>
 <div class="card">
 <h4>二、压缩后仍然可算</h4>
@@ -170,10 +170,10 @@
 
 <h2><span class="num">4.6</span>什么时候列存不划算</h2>
 
-<p>面试里问「列存有什么缺点」时，答「不适合事务」太浅了。真正的边界有三条，每一条都能对应到一个具体的架构决定：</p>
+<p>面试里问「列存有什么缺点」时，答「不适合<a class="gref" href="../reference/glossary.html#transaction">事务</a>」太浅了。真正的边界有三条，每一条都能对应到一个具体的架构决定：</p>
 
 <ul>
-<li><strong>单行更新极贵。</strong> 在有序表的中间插入或修改一行，从修改位置往后所有压缩列都得重写。所以列存系统的写入方式是批量导入（ETL）：写入先进入一个行式、有序的内存结构，积累够了再与磁盘上的列文件合并、成批写成新文件——旧文件保持不可变。这也意味着<strong>「一条一条地 UPDATE」在列存上是反模式</strong>，正确姿势是攒批 + 追加 + 后台合并。</li>
+<li><strong>单行更新极贵。</strong> 在有序表的中间插入或修改一行，从修改位置往后所有压缩列都得重写。所以列存系统的写入方式是批量导入（<a class="gref" href="../reference/glossary.html#extract-transform-load">ETL</a>）：写入先进入一个行式、有序的内存结构，积累够了再与磁盘上的列文件合并、成批写成新文件——旧文件保持不可变。这也意味着<strong>「一条一条地 UPDATE」在列存上是反模式</strong>，正确姿势是攒批 + 追加 + 后台合并。</li>
 <li><strong>点查不占优势。</strong> 列存的强项是「扫很多行、用少数列、做聚合」；「按主键取一行」它在结构上没有任何优势，还要额外拼装各列。所以同一套系统里常见两种引擎并存：OLTP 走行式，分析走列式，中间靠 CDC 同步。</li>
 <li><strong>高基数、无排序、随机写入的列几乎压不动。</strong> 压缩的红利来自重复与有序；一张以随机 UUID 为第一排序列、每行都不同的表，位图和游程编码都失效，剩下的只有通用压缩算法，收益退化到 2–3 倍，而你还付出了「更新要重写整列」的代价。</li>
 </ul>
@@ -266,7 +266,7 @@
 </div>
 
 <div class="key">
-<p><strong>贴进评审文档的话</strong>：本服务采用 LSM 存储引擎（RocksDB），主键按（时间戳、设备 ID）字典序单调编码，写入为顺序追加，实测写放大约 4 倍（对比原 InnoDB 方案的 22 倍）；读路径依赖布隆过滤器挡住不存在的键，点查 p50 为 2 毫秒、p99 在压实期间可达 30 毫秒，因此读接口设置了 50 毫秒超时与重试预算。已知放弃的保证：读延迟不可预测（存在周期性尖峰）；范围扫描需并行查询多层段，全量聚合查询不在此路径上，改由每日离线列存副本承担；数据过期采用分区删除而非墓碑，因此删除延迟以分区为粒度（最长 24 小时）。</p>
+<p><strong>贴进评审文档的话</strong>：本服务采用 LSM 存储引擎（RocksDB），主键按（时间戳、设备 ID）字典序单调编码，写入为顺序追加，实测写放大约 4 倍（对比原 InnoDB 方案的 22 倍）；读路径依赖布隆过滤器挡住不存在的键，点查 p50 为 2 毫秒、p99 在压实期间可达 30 毫秒，因此读接口设置了 50 毫秒<a class="gref" href="../reference/glossary.html#timeout">超时</a>与重试预算。已知放弃的保证：读延迟不可预测（存在周期性尖峰）；范围扫描需并行查询多层段，全量聚合查询不在此路径上，改由每日离线列存副本承担；数据过期采用分区删除而非墓碑，因此删除延迟以分区为粒度（最长 24 小时）。</p>
 </div>
 
 <div class="foot">
