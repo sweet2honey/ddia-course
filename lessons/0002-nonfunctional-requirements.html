@@ -77,7 +77,7 @@
 <table>
   <thead><tr><th>术语</th><th>含义</th><th>排障时怎么用</th></tr></thead>
   <tbody>
-    <tr><td>响应时间 response time</td><td>客户端看到的全部时间，含所有延误</td><td>唯一对用户有意义的量；必须在客户端测</td></tr>
+    <tr><td>响应时间 response time</td><td>客户端看到的总耗时，含系统任何一处产生的延迟（delays incurred anywhere in the system）</td><td>唯一对用户有意义的量；必须在客户端测</td></tr>
     <tr><td>服务时间 service time</td><td>服务真正用于处理该请求的时间</td><td>服务端自测的耗时，通常是响应时间的子集</td></tr>
     <tr><td>排队延迟 queueing delay</td><td>等待 CPU、等待出站网络缓冲区等</td><td>服务端指标里常常「看不见」，是差额的来源</td></tr>
     <tr><td>延迟 latency</td><td>请求没被实际处理的时间（潜伏）</td><td>网络延迟是其中一部分</td></tr>
