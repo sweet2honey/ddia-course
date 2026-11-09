@@ -1,0 +1,13 @@
+# 构建产物
+.build/
+dist/*.epub
+
+# Python
+__pycache__/
+*.pyc
+
+# 调研快照（本地资料，不必入库）
+.research/
+
+# EPUB 构建产物：锚点表
+dist/anchors.json
