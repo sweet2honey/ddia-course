@@ -56,7 +56,11 @@
 
 <p>第三个好处是范围扫描：因为有序，扫一段键就是在段文件里连续读。但这里有个容易忽略的代价：<strong>LSM 的范围查询要并行扫描所有段再归并</strong>，而布隆过滤器（Bloom filter）对范围查询无能为力，因为算不出「范围内每个可能键」的哈希。所以 LSM 的点查靠布隆过滤器挡掉大部分无效段；范围查则要真的碰所有层。</p>
 
-<p>还有一处工程细节，做底层的人会立刻敏感：<strong>写入放大不是均匀发生的——它会在<a class="gref" href="../reference/glossary.html#compaction">压实</a>（compaction）时集中爆发</strong>。memtable 写满时如果压实追不上，RocksDB 一类引擎会施加背压（backpressure），暂停读写直到刷盘完成。在你的监控上，这就是一次 p99 尖峰，而不是平均吞吐下降。压实策略因此不是调优细节，而是容量规划的一部分：</p>
+<p>还有一处工程细节，做底层的人会立刻敏感：<strong>写入放大不是均匀发生的——它会在<a class="gref" href="../reference/glossary.html#compaction">压实</a>（compaction，把若干段文件合并重写成一个）时集中爆发</strong>。memtable 写满时如果压实追不上，RocksDB 一类引擎会施加背压（backpressure），暂停读写直到刷盘完成。在你的监控上，这就是一次 p99 尖峰，而不是平均吞吐下降。压实策略因此不是调优细节，而是容量规划的一部分：</p>
+
+<p>「压实」这个名字值得单独说一句，因为它和「<a class="gref" href="../reference/glossary.html#compression">压缩</a>」不是一回事。压缩（compression）把数据编码得更短，省空间也省 I/O；压实（compaction）把多个<a class="gref" href="../reference/glossary.html#sorted-string-table">段文件</a>归并重写成一个，顺手丢掉被覆盖和已删除的版本。两者在本章都会出现，还经常一起发生：压实写出的新段通常再压缩一次，所以一次后台任务里 CPU 和磁盘都在动。但排障时要分清楚是哪一件在抢资源，它们的调法完全不同。</p>
+
+<p>英文里 compaction 和 compression 也只差几个字母，中文资料对两者的叫法并不统一：有些文档把 compaction 也叫「压缩」。判断依据是动作，不是名字——「合并段文件、丢弃旧版本」是压实，「把字节变短」是压缩。写评审文档时，这两个词第一次出现都把英文带上。</p>
 
 <p class="lead-in">表 4-A　两种常见压实策略，选错的表现是「读延迟随数据量增长而恶化」</p>
 <table>

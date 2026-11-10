@@ -9,10 +9,10 @@
 <body class="sheet">
 <main class="page">
 
-<p class="crumb">速查 · 术语表 · 全书 14 章 · 109 条</p>
+<p class="crumb">速查 · 术语表 · 全书 14 章 · 110 条</p>
 
 <h1>术语表</h1>
-<p class="standfirst">收录原则有三条。第一，词条以中文译本 <a href="https://ddia.vonng.com/glossary/">原站术语表</a> 的 61 条为底，另外补了 48 条书里反复出现、原表没收的词（复制滞后、写偏斜、水位线、栅栏令牌……），因为在评审里漏掉这些词比漏掉「无界」严重得多。第二，每条都给<strong>准确定义 + 最常见误用 + 对应课程</strong>——在系统设计面试里，把「线性一致」说成「强一致」不是措辞问题，是让对方无法判断你承诺了什么。第三，按主题分组，不按字母序：中文读者查词靠的是「它属于哪一类问题」，不是首字母。</p>
+<p class="standfirst">收录原则有三条。第一，词条以中文译本 <a href="https://ddia.vonng.com/glossary/">原站术语表</a> 的 61 条为底，另外补了 49 条书里反复出现、原表没收的词（复制滞后、写偏斜、水位线、栅栏令牌……），因为在评审里漏掉这些词比漏掉「无界」严重得多。第二，每条都给<strong>准确定义 + 最常见误用 + 对应课程</strong>——在系统设计面试里，把「线性一致」说成「强一致」不是措辞问题，是让对方无法判断你承诺了什么。第三，按主题分组，不按字母序：中文读者查词靠的是「它属于哪一类问题」，不是首字母。</p>
 
 <div class="key">
 <p>查词的正确姿势：先找这词在哪一组，再读它的 <span class="see">→</span> 指到哪一课。术语表的定义只能让你不再说错，能让你在评审里接得住追问的是那一课。</p>
@@ -249,7 +249,14 @@
 <dt id="compaction">压实<span class="en">compaction</span></dt>
 <dd>
 <p>后台把多个 SSTable 归并重写、丢弃被覆盖或已删除的版本。它带来两个副作用：磁盘带宽被后台任务吃掉（前台 p99 抖动的主因），以及压实跟不上写入时读放大持续恶化。</p>
-<p class="avoid">别说「后台任务不影响前台」。压实与前台写共享同一块盘，限流做不好就是尾延迟灾难。</p>
+<p class="avoid">别说「后台任务不影响前台」。压实与前台写共享同一块盘，限流做不好就是尾延迟灾难。也别把 compaction 说成「压缩」——那是 <a href="#compression">compression</a>，另一件事。</p>
+<p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
+</dd>
+
+<dt id="compression">压缩<span class="en">compression</span></dt>
+<dd>
+<p>把数据编码得更短，省磁盘空间也省 I/O 带宽，代价是每次读写都要多花 CPU。行存通常按块压缩，列存压缩率更高（同列同类型，重复多），所以位图编码、游程编码这类列内方案特别有效。</p>
+<p class="avoid">别和 <a href="#compaction">压实</a>（compaction）混为一谈。「合并段文件、丢弃旧版本」是压实，「把字节变短」是压缩。有些中文文档把 compaction 也译作「压缩」，判断依据是动作而不是名字。</p>
 <p class="see">→ <a href="../lessons/0004-storage-and-retrieval.html">L4</a></p>
 </dd>
 
