@@ -105,3 +105,31 @@
 **样式**：`a.gref` 继承正文色 + 点线，hover 才变链接色——252 处若用默认蓝色下划线会把正文弄得像目录。术语表一侧加了 `.gloss dt:target`（淡底 + 强调色）与 `scroll-margin-top`，跳过去能立刻看到落在哪一条。
 
 **踩过的坑**：`blockquote` 与 `cite` 一开始不在保护区里，导致章首引文被加了链接，已回滚重跑。`tools/link_terms.py` **不是幂等的**——重跑前先 `git checkout lessons/`。
+
+## 课末导航三格（2026-11-10）
+
+需求原话：「lesson 网页底部的 `class="nav-links"` 增加一个居中的课程首页」。
+
+**改法**：`.nav-links` 从「左右两格、`justify-content: space-between`」改成三格网格 `.nav-links.nav-3`：
+
+```css
+grid-template-columns: 1fr auto 1fr;   /* 首页那格宽度自适应并居中 */
+```
+
+左右两格各占一半剩余宽度，所以 L1（没有上一课）和 L14（没有下一课）首页依然在正中——用 `space-between` 做不到这点，缺一格就会跑位。
+
+**HTML 结构**（14 课统一）：
+
+```html
+<div class="nav-links nav-3">
+  <span class="prev"><a href="…">← L1 · …</a></span>
+  <span class="home"><a href="../index.html">课程首页</a></span>
+  <span class="next"><a href="…">L3 · … →</a></span>
+</div>
+```
+
+首页那格风格刻意比左右两侧淡（`--ink-faint`、无常态下划线，hover 才转链接色），因为它的作用是「随时能回退」而不是主行动，左右两课才是主路径。
+
+**窄屏**（≤560px）改成两行：上下两课并排在第一行，首页单独落到第二行左对齐——三格挤在一行会让课名折成多行。
+
+`reference/glossary.html` 与 `reference/cheatsheet.html` 的 `.nav-links` 是两格（`.page.sheet` 内），**没有加 `nav-3`**，保持原样。
