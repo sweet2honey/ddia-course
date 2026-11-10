@@ -9,10 +9,10 @@
 <body class="sheet">
 <main class="page">
 
-<p class="crumb">速查 · 术语表 · 全书 14 章 · 107 条</p>
+<p class="crumb">速查 · 术语表 · 全书 14 章 · 109 条</p>
 
 <h1>术语表</h1>
-<p class="standfirst">收录原则有三条。第一，词条以中文译本 <a href="https://ddia.vonng.com/glossary/">原站术语表</a> 的 61 条为底，另外补了 46 条书里反复出现、原表没收的词（复制滞后、写偏斜、水位线、栅栏令牌……），因为在评审里漏掉这些词比漏掉「无界」严重得多。第二，每条都给<strong>准确定义 + 最常见误用 + 对应课程</strong>——在系统设计面试里，把「线性一致」说成「强一致」不是措辞问题，是让对方无法判断你承诺了什么。第三，按主题分组，不按字母序：中文读者查词靠的是「它属于哪一类问题」，不是首字母。</p>
+<p class="standfirst">收录原则有三条。第一，词条以中文译本 <a href="https://ddia.vonng.com/glossary/">原站术语表</a> 的 61 条为底，另外补了 48 条书里反复出现、原表没收的词（复制滞后、写偏斜、水位线、栅栏令牌……），因为在评审里漏掉这些词比漏掉「无界」严重得多。第二，每条都给<strong>准确定义 + 最常见误用 + 对应课程</strong>——在系统设计面试里，把「线性一致」说成「强一致」不是措辞问题，是让对方无法判断你承诺了什么。第三，按主题分组，不按字母序：中文读者查词靠的是「它属于哪一类问题」，不是首字母。</p>
 
 <div class="key">
 <p>查词的正确姿势：先找这词在哪一组，再读它的 <span class="see">→</span> 指到哪一课。术语表的定义只能让你不再说错，能让你在评审里接得住追问的是那一课。</p>
@@ -97,6 +97,21 @@
 <dd>
 <p>可运维（operability）、简单（simplicity）、可演化（evolvability）三项的合称。书里给它的定位很硬：它是唯一一项你每天都要付利息的维度。</p>
 <p class="avoid">别把可维护性当成「代码风格」。在数据系统里它的具体形态是：加一个字段要动几个服务、换一个存储引擎要重写多少、排一次故障要开几个面板。</p>
+<p class="see">→ <a href="../lessons/0002-nonfunctional-requirements.html">L2</a></p>
+</dd>
+
+<dt id="slo">服务级别目标<span class="en">SLO · service-level objective</span></dt>
+<dd>
+<p>团队给自己定的、可测量的内部目标。一条合格的 SLO 必须写全四件事：<em>哪个指标、哪个分位数、阈值多少、在什么窗口内统计</em>。例如「滚动 28 天内，首页接口的 p99 响应时间低于 1 秒，且 99.9% 的请求返回非错误响应」。</p>
+<p>它是三个缩写里的中间那个：被观测的指标本身叫 <em>SLI</em>（service-level indicator，如「p99 响应时间」），SLO 是给这个指标设的阈值，SLA 是把阈值写进合同。顺序是 SLI → SLO → SLA，混着用就说不清你在承诺什么。</p>
+<p class="avoid">别把 SLO 写成形容词。「响应快」「高可用」「尽量不丢数据」都不是 SLO：没有分位数、没有窗口、没有测点，就无法验收，也无法在事故复盘时判断到底算不算违约。</p>
+<p class="see">→ <a href="../lessons/0002-nonfunctional-requirements.html">L2</a></p>
+</dd>
+
+<dt id="sla">服务级别协议<span class="en">SLA · service-level agreement</span></dt>
+<dd>
+<p>对外的商业合同，规定没达到约定的服务级别时<em>后果是什么</em>：退款、抵扣、赔偿、或者客户可以无罚退出。它比 SLO 更粗、更保守，因为每提高一个九都要真金白银，而违约要付钱。</p>
+<p class="avoid">别把内部目标叫成 SLA。给同事看的叫 SLO，给客户签字的才叫 SLA；对着监控面板说「我们 SLA 是 p99 100 ms」，是把承诺和愿望混成了一句。</p>
 <p class="see">→ <a href="../lessons/0002-nonfunctional-requirements.html">L2</a></p>
 </dd>
 </dl>

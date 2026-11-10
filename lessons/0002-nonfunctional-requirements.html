@@ -20,7 +20,7 @@
 
 <p>原文点出的关键差别是：<em>这些要求未必会明确写下来，因为它们看似理所当然</em>。而这正是它们在评审里最危险的地方：没写下来的东西无法验收，也就无法在「这个功能能不能下周上线」的讨论里占一个席位。一个慢得让人无法忍受、或很不可靠的应用，几乎等于不存在；但它在需求文档里占的篇幅是零。</p>
 
-<p>本章覆盖四项：性能（怎么定义和测量）、可靠性（出问题时还能不能正确工作）、<a class="gref" href="../reference/glossary.html#scalability">可伸缩性</a>（负载涨了能不能高效加算力）、<a class="gref" href="../reference/glossary.html#maintainability">可维护性</a>（长期是否容易改）。四项有个共同结构：<strong>每一项都必须先有一个「当前值」，才谈得上「要求」</strong>。没有基线，SLO 是许愿。</p>
+<p>本章覆盖四项：性能（怎么定义和测量）、可靠性（出问题时还能不能正确工作）、<a class="gref" href="../reference/glossary.html#scalability">可伸缩性</a>（负载涨了能不能高效加算力）、<a class="gref" href="../reference/glossary.html#maintainability">可维护性</a>（长期是否容易改）。四项有个共同结构：<strong>每一项都必须先有一个「当前值」，才谈得上「要求」</strong>。这就是<a class="gref" href="../reference/glossary.html#slo"><strong>SLO</strong></a>（服务级别目标，service-level objective）的意思：把「快」写成一条能验收的内部目标——哪个指标、哪个分位数、阈值多少、在多长的窗口里统计。没有这个基线，SLO 只是一句许愿。</p>
 
 <h2><span class="num">2.2</span>先有一个具体的负载，否则谈不了性能</h2>
 
@@ -146,7 +146,22 @@
 
 <p>原文还补了一条实操上的坑：计算分位数时，<em>对分位数取平均值——例如为了降低时间分辨率，或合并多台机器的数据——在数学上没有意义</em>。聚合响应时间数据的正确方法是<strong>把直方图相加</strong>。这条在监控系统里天天出错：把 10 台机器的 p99 取平均，得到的数字既不是整体的 p99，也不是任何一台的 p99。开源库（HdrHistogram、t-digest、DDSketch 等）解决的问题就是「用极低开销维护可合并的直方图」。</p>
 
-<p>最后是 SLO 与 SLA 的区别，这个区别在对外承诺时是法律问题：<strong>SLO</strong>（服务级别目标）是内部目标，比如「中位响应时间 &lt; 200 ms、p99 &lt; 1 s、至少 99.9% 的有效请求返回非错误响应」；<strong>SLA</strong>（服务级别协议）是合同，规定没达到 SLO 会怎样（例如客户有权获得退款）。原文也诚实地说：在实践中为 SLO/SLA 定义良好的可用性指标并不简单。</p>
+<p>最后是那个在评审里最容易被混着用的三件套。它们是层层收窄的关系，不是三个同义词：</p>
+
+<table>
+  <thead><tr><th>缩写</th><th>全称</th><th>它是什么</th><th>能不能追责</th></tr></thead>
+  <tbody>
+    <tr><td><strong>SLI</strong></td><td>service-level indicator，服务级别指标</td><td>被观测的那个数本身：滚动 28 天的 p99 响应时间、错误率、可用分钟数</td><td>不能，它只是测量</td></tr>
+    <tr><td><strong>SLO</strong></td><td>service-level objective，服务级别目标</td><td>给这个数设的阈值，例如「28 天内 p99 &lt; 1 s，且 99.9% 的请求成功」</td><td>能追内部责任，但不能拿来赔钱</td></tr>
+    <tr><td><strong>SLA</strong></td><td>service-level agreement，服务级别协议</td><td>写进合同的 SLO，外加「没达到会怎样」：退款、抵扣、客户可无罚退出</td><td>能，是法律与商业后果</td></tr>
+  </tbody>
+</table>
+
+<p>所以三者的顺序是 SLI → SLO → SLA：先有一个测得出、说得清的数，再给它定一条内部红线，最后才谈要不要把红线写进合同、违约怎么赔。搞反了就出两种典型事故：把 SLA 的数字当内部指标追，团队会为了保赔偿而隐瞒故障；把 SLO 当合同对外宣传，客户按字面索赔时你没有免责条款。</p>
+
+<p>一条合格的 SLO 必须同时给全四个要素，缺一个就可以被追问到底：<strong>哪个指标</strong>（p99 还是错误率）、<strong>阈值多少</strong>（1 s）、<strong>多长的统计窗口</strong>（滚动 28 天还是自然月）、<strong>在哪儿测</strong>（客户端、网关、还是服务端自报）。四者任一含糊，「达标」就变成各说各话。原文也诚实地承认：在实践中为 SLO/SLA 定义良好的可用性指标并不简单。</p>
+
+<p>至于 SLA 的条款长什么样，常见的写法是「月度可用性低于 99.9% 时，按不足部分返还当月费用的 10%，低于 99% 时返还 50%」。注意这种条款的两个隐含事实：<strong>SLA 一定比 SLO 松</strong>（留出缓冲，否则天天赔钱），<strong>赔偿上限通常远低于真实损失</strong>（客户业务停摆一天，退的那点费用根本不覆盖）。所以 SLA 是兜底，不是可靠性的目标函数。</p>
 
 <h2><span class="num">2.5</span>可靠性：故障不是失效</h2>
 
