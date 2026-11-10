@@ -544,6 +544,43 @@ tbody tr:last-child td { border-bottom: none; }
   font-family: var(--sans);
   font-size: 0.86rem;
 }
+/* 课末导航：上一课 · 课程首页 · 下一课。首页那格固定居中，
+   左右两格各占一半，所以哪怕缺少上一课或下一课，首页也不会跑位。 */
+.nav-links.nav-3 {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+}
+.nav-links.nav-3 .prev { text-align: left; }
+.nav-links.nav-3 .home {
+  text-align: center;
+  padding: 0 1.2rem;
+}
+.nav-links.nav-3 .next { text-align: right; }
+.nav-links.nav-3 .home a {
+  color: var(--ink-faint);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+.nav-links.nav-3 .home a:hover,
+.nav-links.nav-3 .home a:focus-visible {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 560px) {
+  .nav-links.nav-3 {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 0.7rem;
+  }
+  .nav-links.nav-3 .home {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    text-align: left;
+    padding: 0;
+  }
+  .nav-links.nav-3 .next { text-align: right; }
+}
 
 /* ---- 打印 ---- */
 @page { margin: 14mm; }
